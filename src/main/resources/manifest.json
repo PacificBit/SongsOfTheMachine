@@ -1,0 +1,12 @@
+{
+  "Group": "com.pacificbytestudios",
+  "Name": "songsofthemachine",
+  "Version": "0.0.1",
+  "Main": "com.pacificbytestudios.songsofthemachine.SongsOfTheMachine",
+  "Authors": [
+    {
+      "Name": "PacificByte"
+    }
+  ],
+  "IncludesAssetPack": true
+}

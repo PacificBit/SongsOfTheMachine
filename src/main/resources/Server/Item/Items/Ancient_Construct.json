@@ -48,7 +48,7 @@
         }
       ]
     },
-    "VariantRotation": "None",
+    "VariantRotation": "NESW",
     "BlockEntity": {
       "Components": {
         "AncientConstuctComponent": {
@@ -57,7 +57,7 @@
       }
     },
     "PlacementSettings": {
-      "BlockPreviewVisibility": "AlwaysHidden"
+      "BlockPreviewVisibility": "AlwaysVisible"
     }
   },
   "Tags": {

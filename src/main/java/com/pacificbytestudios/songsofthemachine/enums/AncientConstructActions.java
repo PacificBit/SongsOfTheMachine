@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum AncientConstructActions {
   IDLE((byte) 0, 1),
-  MOVE_FORWARD((byte) 1, 1),
+  MOVE_FORWARD((byte) 1, 0.25f),
   TURN_LEFT((byte) 2, 1),
   TURN_RIGHT((byte) 3, 1),
   BREAK_BLOCK((byte) 4, 1);

@@ -9,11 +9,16 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
-import com.pacificbytestudios.songsofthemachine.enums.AncientConstructActions;
 import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
 
 public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
+  private AncientConstructStore store;
+
+  public AncientConstructPlacementSystem() {
+    store = AncientConstructStore.get();
+  }
 
   @Override
   public void onEntityAdded(
@@ -21,12 +26,16 @@ public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
       AddReason reason,
       Store<ChunkStore> store,
       CommandBuffer<ChunkStore> commandBuffer) {
-    AncientConstructStore.get().addAncient(ref);
-    AncientConstuctComponent component = store.getComponent(ref, AncientConstuctComponent.getComponentType());
-    component.addAction(AncientConstructActions.MOVE_FORWARD);
-    component.addAction(AncientConstructActions.TURN_LEFT);
-    component.addAction(AncientConstructActions.TURN_RIGHT);
-    component.addAction(AncientConstructActions.BREAK_BLOCK);
+    BlockModule.BlockStateInfo info = store.getComponent(ref, BlockModule.BlockStateInfo.getComponentType());
+    Ref<ChunkStore> chunkRef = info.getChunkRef();
+    if (!chunkRef.isValid()) {
+      System.err.println("[AncientConstructPlacementSystem] Could not find chunk during entity creation");
+      return;
+    }
+
+    this.store.addAncient(ref);
+    this.store.setAncientConstructChunkId(chunkRef, ref);
+
     System.out.println("[AncientConstructPlacementSystem] Added new entity");
   }
 
@@ -36,7 +45,16 @@ public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
       RemoveReason reason,
       Store<ChunkStore> store,
       CommandBuffer<ChunkStore> commandBuffer) {
-    AncientConstructStore.get().removeAncient(ref);
+    BlockModule.BlockStateInfo info = store.getComponent(ref, BlockModule.BlockStateInfo.getComponentType());
+    Ref<ChunkStore> chunkRef = info.getChunkRef();
+    if (!chunkRef.isValid()) {
+      System.err.println("[AncientConstructPlacementSystem] Could not find chunk during entity removal");
+      return;
+    }
+
+    this.store.removeAncient(ref);
+    this.store.removeAncientConstructFromChunkId(chunkRef, ref);
+
     System.out.println("[AncientConstructPlacementSystem] Removed entity");
   }
 

@@ -51,8 +51,7 @@
     "VariantRotation": "NESW",
     "BlockEntity": {
       "Components": {
-        "AncientConstuctComponent": {
-        }
+        "AncientConstuctComponent": {}
       }
     }
   },

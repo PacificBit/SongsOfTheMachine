@@ -1,7 +1,5 @@
 package com.pacificbytestudios.songsofthemachine.components;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -11,21 +9,15 @@ import com.pacificbytestudios.songsofthemachine.SongsOfTheMachine;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructActions;
 
 public class AncientConstuctComponent implements Component<ChunkStore> {
-  public static final BuilderCodec<AncientConstuctComponent> CODEC = BuilderCodec
-      .builder(AncientConstuctComponent.class, AncientConstuctComponent::new)
-
-      .append(new KeyedCodec<>("State", Codec.BYTE),
-          (obj, value) -> obj.state = AncientConstructActions.fromByte(value),
-          (obj) -> obj.state.getId())
-      .add()
-
-      .build();
   private static final int BIT_ACTION_SIZE = 8;
   private static final int ACTION_BUFFER_SIZE = 4;
   private static final int MASK_SLOT_0 = 0x000000FF;
   private static final int MASK_SLOT_1 = 0x0000FF00;
   private static final int MASK_SLOT_2 = 0x00FF0000;
   private static final int MASK_SLOT_3 = 0xFF000000;
+  public static final BuilderCodec<AncientConstuctComponent> CODEC = BuilderCodec
+      .builder(AncientConstuctComponent.class, AncientConstuctComponent::new)
+      .build();
 
   private AncientConstructActions state;
   private int actionBuffer;

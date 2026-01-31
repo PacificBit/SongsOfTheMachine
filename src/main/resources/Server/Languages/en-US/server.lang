@@ -1,2 +1,3 @@
 construct.name=Ancient Construct
 construct.description=Does not obey commands — it listens, remembers, and turns sound into motion.
+tools.move_forward.name=Move Forward

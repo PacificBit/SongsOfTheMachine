@@ -1,6 +1,7 @@
 {
   "TranslationProperties": {
-    "Name": "server.tools.move_forward.name"
+    "Name": "server.tools.poor_quality.tool.name",
+    "Description": "server.tools.poor_quality.tool.description"
   },
   "Parent": "Plant_Bramble_Moss_Twisted",
   "Icon": "Icons/ItemsGenerated/Plant_Bramble_Lavathorn.png",
@@ -38,18 +39,34 @@
     ],
     "ParticleColor": "#47242a",
     "Effect": [],
-    "HitboxType": "Plant_Full"
+    "Flags": {
+      "IsUsable": true
+    },
+    "BlockEntity": {
+      "Components": {
+        "MusicToolComponent": {
+          "Action": 2
+        }
+      }
+    }
   },
   "Interactions": {
     "Secondary": {
       "Interactions": [
         {
-          "Type": "MusicToolInteraction",
+          "Type": "MusicToolUseInteraction",
           "Action": {
             "Move Forward": true
           },
           "Quality": 1,
           "ActionsCapacity": 1
+        }
+      ]
+    },
+    "Use": {
+      "Interactions": [
+        {
+          "Type": "MusicToolChangeAction"
         }
       ]
     }

@@ -7,7 +7,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
-import com.pacificbytestudios.songsofthemachine.interactions.MusicToolInteraction;
+import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
+import com.pacificbytestudios.songsofthemachine.interactions.MusicToolChangeActionInteraction;
+import com.pacificbytestudios.songsofthemachine.interactions.MusicToolUseInteraction;
 import com.pacificbytestudios.songsofthemachine.systems.AncientConstructLogicSystem;
 import com.pacificbytestudios.songsofthemachine.systems.AncientConstructPlacementSystem;
 
@@ -15,6 +17,7 @@ public final class SongsOfTheMachine extends JavaPlugin {
   private static SongsOfTheMachine INSTANCE;
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private ComponentType<ChunkStore, AncientConstuctComponent> ancientConstructorComponentType;
+  private ComponentType<ChunkStore, MusicToolComponent> musicToolComponentType;
 
   public SongsOfTheMachine(JavaPluginInit init) {
     super(init);
@@ -33,10 +36,15 @@ public final class SongsOfTheMachine extends JavaPlugin {
     this.ancientConstructorComponentType = this.getChunkStoreRegistry()
         .registerComponent(AncientConstuctComponent.class, "AncientConstuctComponent", AncientConstuctComponent.CODEC);
     System.out.println("[SongsOfTheMachine] Registered AncientConstuctComponent");
+    this.musicToolComponentType = this.getChunkStoreRegistry()
+        .registerComponent(MusicToolComponent.class, "MusicToolComponent", MusicToolComponent.CODEC);
+    System.out.println("[SongsOfTheMachine] Registered MusicToolComponent");
 
     this.getCodecRegistry(Interaction.CODEC)
-        .register("MusicToolInteraction", MusicToolInteraction.class, MusicToolInteraction.CODEC);
-    System.out.println("[SongsOfTheMachine] Registered MusicToolInteraction");
+        .register("MusicToolUseInteraction", MusicToolUseInteraction.class, MusicToolUseInteraction.CODEC)
+        .register("MusicToolChangeAction", MusicToolChangeActionInteraction.class,
+            MusicToolChangeActionInteraction.CODEC);
+    System.out.println("[SongsOfTheMachine] Registered MusicToolUseInteraction & MusicToolChangeActionInteraction");
 
     this.getChunkStoreRegistry().registerSystem(new AncientConstructPlacementSystem());
     System.out.println("[SongsOfTheMachine] Registered placement system");
@@ -45,7 +53,11 @@ public final class SongsOfTheMachine extends JavaPlugin {
   }
 
   public ComponentType<ChunkStore, AncientConstuctComponent> getAncientConstructorComponentType() {
-    return ancientConstructorComponentType;
+    return this.ancientConstructorComponentType;
+  }
+
+  public ComponentType<ChunkStore, MusicToolComponent> getMusicToolComponentType() {
+    return this.musicToolComponentType;
   }
 
 }

@@ -13,7 +13,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
-import com.pacificbytestudios.songsofthemachine.enums.AncientConstructActions;
+import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 
 public class MusicToolChangeActionInteraction extends SimpleInteraction {
 
@@ -43,15 +43,15 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
 
       MusicToolComponent comp = current.getFromMetadataOrDefault(MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC);
-      AncientConstructActions curr = comp.getAction() != null ? comp.getAction() : AncientConstructActions.IDLE;
+      AncientConstructAction curr = comp.getAction() != null ? comp.getAction() : AncientConstructAction.IDLE;
 
       switch (curr) {
-        case IDLE -> comp.setAction(AncientConstructActions.MOVE_FORWARD);
-        case MOVE_FORWARD -> comp.setAction(AncientConstructActions.TURN_LEFT);
-        case TURN_LEFT -> comp.setAction(AncientConstructActions.TURN_RIGHT);
-        case TURN_RIGHT -> comp.setAction(AncientConstructActions.BREAK_BLOCK);
-        case BREAK_BLOCK -> comp.setAction(AncientConstructActions.IDLE);
-        default -> comp.setAction(AncientConstructActions.IDLE);
+        case IDLE -> comp.setAction(AncientConstructAction.MOVE_FORWARD);
+        case MOVE_FORWARD -> comp.setAction(AncientConstructAction.TURN_LEFT);
+        case TURN_LEFT -> comp.setAction(AncientConstructAction.TURN_RIGHT);
+        case TURN_RIGHT -> comp.setAction(AncientConstructAction.BREAK_BLOCK);
+        case BREAK_BLOCK -> comp.setAction(AncientConstructAction.IDLE);
+        default -> comp.setAction(AncientConstructAction.IDLE);
       }
 
       world.sendMessage(Message.raw("Tool changed to: " + comp.getAction()));

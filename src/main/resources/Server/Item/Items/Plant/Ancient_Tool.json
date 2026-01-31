@@ -61,14 +61,20 @@
           "Quality": 1,
           "ActionsCapacity": 1
         }
-      ]
+      ],
+      "Cooldown": {
+        "Cooldown": 0.5
+      }
     },
     "Use": {
       "Interactions": [
         {
           "Type": "MusicToolChangeAction"
         }
-      ]
+      ],
+      "Cooldown": {
+        "Cooldown": 0.5
+      }
     }
   }
 }

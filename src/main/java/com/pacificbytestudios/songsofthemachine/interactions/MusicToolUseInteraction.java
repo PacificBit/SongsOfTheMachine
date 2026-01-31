@@ -23,7 +23,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.customcodec.ActionSelection;
-import com.pacificbytestudios.songsofthemachine.enums.AncientConstructActions;
+import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
+import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 import com.pacificbytestudios.songsofthemachine.enums.MusicToolQuality;
 import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
 import com.pacificbytestudios.songsofthemachine.utils.Utils;
@@ -49,7 +50,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
       .add()
       .build();
 
-  private AncientConstructActions action;
+  private AncientConstructAction action;
   private byte quality;
   private Byte actionCapacity;
   private AncientConstructStore store;
@@ -78,17 +79,17 @@ public class MusicToolUseInteraction extends SimpleInteraction {
         this.action = comp.getAction();
       } else {
         System.err.println("[MusicToolUseInteraction] Could not fetch action");
-        this.action = AncientConstructActions.IDLE;
+        this.action = AncientConstructAction.IDLE;
       }
 
       System.out.println("[MusicToolUseInteraction] Using current tool to apply the action: " + this.action);
 
-      TransformComponent tc = playerRef.getStore()
+      TransformComponent transformComponent = playerRef.getStore()
           .getComponent(playerRef, TransformComponent.getComponentType());
-      if (tc == null)
+      if (transformComponent == null)
         return;
 
-      Vector3i playerPos = tc.getPosition().toVector3i();
+      Vector3i playerPos = transformComponent.getPosition().toVector3i();
       MusicToolQuality tollQuality = MusicToolQuality.fromId(quality);
       if (tollQuality == null) {
         return;
@@ -140,7 +141,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
           AncientConstuctComponent component = construct.getStore().getComponent(
               construct,
               AncientConstuctComponent.getComponentType());
-          if (component == null)
+          if (component == null || component.getStatus() != AncientConstructStatus.LISTENING)
             continue;
 
           if (component.getActionCapacity() != this.actionCapacity) {

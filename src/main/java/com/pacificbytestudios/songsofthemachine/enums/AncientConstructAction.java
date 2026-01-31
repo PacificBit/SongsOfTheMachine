@@ -3,17 +3,17 @@ package com.pacificbytestudios.songsofthemachine.enums;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum AncientConstructActions {
+public enum AncientConstructAction {
   IDLE((byte) 0, 1),
-  MOVE_FORWARD((byte) 1, 0.25f),
-  TURN_LEFT((byte) 2, 1),
-  TURN_RIGHT((byte) 3, 1),
+  MOVE_FORWARD((byte) 1, 0.15f),
+  TURN_LEFT((byte) 2, 0.15f),
+  TURN_RIGHT((byte) 3, 0.15f),
   BREAK_BLOCK((byte) 4, 1);
 
-  private static final Map<Byte, AncientConstructActions> BY_ID = new HashMap<>();
+  private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
 
   static {
-    for (AncientConstructActions action : values()) {
+    for (AncientConstructAction action : values()) {
       BY_ID.put(action.id, action);
     }
   }
@@ -21,7 +21,7 @@ public enum AncientConstructActions {
   private final byte id;
   private final float executionTime; // in secs
 
-  AncientConstructActions(byte id, float executionTime) {
+  AncientConstructAction(byte id, float executionTime) {
     this.id = id;
     this.executionTime = executionTime;
   }
@@ -34,7 +34,7 @@ public enum AncientConstructActions {
     return this.executionTime;
   }
 
-  public static AncientConstructActions fromByte(byte id) {
+  public static AncientConstructAction fromByte(byte id) {
     return BY_ID.get(id);
   }
 }

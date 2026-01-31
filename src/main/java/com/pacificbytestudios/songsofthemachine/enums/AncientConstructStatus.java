@@ -8,7 +8,7 @@ public enum AncientConstructStatus {
   LISTENING((byte) 1),
   READY_TO_EXECUTE((byte) 2),
   EXECUTING((byte) 3),
-  COMEPLETED((byte) 4),
+  COMPLETED((byte) 4),
   COOLDOWN((byte) 5),
   ERROR((byte) 6);
 

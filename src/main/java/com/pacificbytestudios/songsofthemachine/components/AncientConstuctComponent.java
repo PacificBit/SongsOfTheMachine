@@ -24,10 +24,6 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
           (obj, value) -> obj.timeout = value,
           (obj) -> obj.timeout)
       .add()
-      .append(new KeyedCodec<>("RotationIndex", Codec.BYTE),
-          (obj, value) -> obj.rotationIndex = value,
-          (obj) -> obj.rotationIndex)
-      .add()
       .build();
 
   private AncientConstructStatus status;
@@ -35,7 +31,6 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
   private byte actionCount;
   private float clock;
   private float timeout;
-  private byte rotationIndex;
   private byte actionCapacity;
 
   public AncientConstuctComponent() {
@@ -48,8 +43,8 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
       this.status = AncientConstructStatus.ERROR;
       return false;
     }
-
-    this.actionBuffer |= (action.getId() << (this.actionCount * BIT_ACTION_SIZE));
+    int id = action.getId() & 0xFF;
+    this.actionBuffer |= (id << (this.actionCount * BIT_ACTION_SIZE));
     this.actionCount += 1;
 
     if (this.actionCount == this.actionCapacity) {
@@ -76,14 +71,6 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
 
   public void resetTime() {
     this.clock = 0f;
-  }
-
-  public void setRotationIndex(byte rotation) {
-    this.rotationIndex = rotation;
-  }
-
-  public byte getRotationIndex(byte rotation) {
-    return this.rotationIndex;
   }
 
   public void clearActionBuffer() {
@@ -132,7 +119,7 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     if (this.actionCount == 0) {
       return null;
     }
-    return AncientConstructAction.fromByte((byte) ((actionBuffer & MASK_SLOT_0) >>> 0));
+    return AncientConstructAction.fromByte((byte) (actionBuffer & MASK_SLOT_0));
   }
 
   public void clearNextAction() {
@@ -143,7 +130,7 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     this.actionCount--;
 
     if (this.actionCount == 0) {
-      this.status = AncientConstructStatus.COMEPLETED;
+      this.status = AncientConstructStatus.COMPLETED;
     }
   }
 
@@ -158,8 +145,17 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     c.actionBuffer = this.actionBuffer;
     c.actionCount = this.actionCount;
     c.timeout = this.timeout;
-    c.rotationIndex = this.rotationIndex;
+    c.actionCapacity = this.actionCapacity;
     return c;
+  }
+
+  public void copyFrom(AncientConstuctComponent other) {
+    this.status = other.status;
+    this.actionBuffer = other.actionBuffer;
+    this.actionCount = other.actionCount;
+    this.clock = other.clock;
+    this.timeout = other.timeout;
+    this.actionCapacity = other.actionCapacity;
   }
 
 }

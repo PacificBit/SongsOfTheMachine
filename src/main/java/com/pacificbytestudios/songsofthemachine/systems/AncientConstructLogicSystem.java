@@ -124,12 +124,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         xModifier = (rotation == 1) ? 1 : -1;
       }
 
-      context.getChunk()
-          .breakBlock(
-              blockPos.x,
-              blockPos.y,
-              blockPos.z);
-
       System.out.println("[AncientConstructLogicSystem] moveForward - Moving: " + blockPos);
 
       Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
@@ -139,6 +133,18 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         System.out.println("[AncientConstructLogicSystem] moveForward - Invalid new chunk");
         return;
       }
+
+      if (!chunk.getBlockType(newPos).getId().equals("Empty")
+          || !chunk.getBlockType(newPos.clone().add(Vector3i.UP)).getId().equals("Empty")) {
+        System.out.println("[AncientConstructLogicSystem] moveForward - Cannot move");
+        return;
+      }
+
+      context.getChunk()
+          .breakBlock(
+              blockPos.x,
+              blockPos.y,
+              blockPos.z);
 
       chunk.setBlock(
           newPos.x,

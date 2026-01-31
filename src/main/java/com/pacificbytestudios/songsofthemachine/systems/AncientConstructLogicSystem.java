@@ -172,12 +172,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       rotation += (action == AncientConstructAction.TURN_LEFT) ? 1 : -1;
       rotation = (rotation + 4) % 4;
 
-      context.getChunk()
-          .breakBlock(
-              blockPos.x,
-              blockPos.y,
-              blockPos.z);
-      System.out.println("Turning");
       context.getChunk().setBlock(
           blockPos.x,
           blockPos.y,

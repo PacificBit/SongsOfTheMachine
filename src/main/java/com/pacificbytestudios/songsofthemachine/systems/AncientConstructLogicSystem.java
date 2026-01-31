@@ -34,23 +34,30 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       int index,
       ArchetypeChunk<ChunkStore> archetypeChunk,
       Store<ChunkStore> chunkStore,
-      CommandBuffer<ChunkStore> commandBuffer) {
-    for (Ref<ChunkStore> entityRef : this.store.getAncientConstuctComponents()) {
+      CommandBuffer<ChunkStore> cb) {
+    Ref<ChunkStore> entityRef = archetypeChunk.getReferenceTo(index);
 
-      if (!entityRef.isValid()) {
-        continue;
-      }
+    if (!entityRef.isValid() || !this.store.hasPendingCommands(entityRef)) {
+      return;
+    }
 
-      BlockModule.BlockStateInfo info = commandBuffer.getComponent(
-          entityRef,
-          BlockModule.BlockStateInfo.getComponentType());
-      WorldContext context = getWorldContext(commandBuffer, info.getChunkRef());
+    AncientConstuctComponent construct = archetypeChunk.getComponent(
+        index, AncientConstuctComponent.getComponentType());
 
-      if (!context.isValid()) {
-        continue;
-      }
+    BlockModule.BlockStateInfo info = archetypeChunk.getComponent(
+        index, BlockModule.BlockStateInfo.getComponentType());
 
-      // move(context, info);
+    if (construct == null || info == null) {
+      return;
+    }
+
+    System.out
+        .println("[AncientConstructLogicSystem] Entity " + entityRef.getIndex() + ", clock: " + construct.getClock());
+
+    if (construct.addTimeAndCheckIfTimeout(deltaTime)) {
+      this.store.removeAncient(entityRef);
+      construct.clearActionBuffer();
+      System.out.println("[AncientConstructLogicSystem] Entity command timeout");
     }
   }
 
@@ -77,15 +84,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   // 0);
   // });
   // }
-
-  private WorldContext getWorldContext(CommandBuffer<ChunkStore> cb, Ref<ChunkStore> ref) {
-    WorldChunk worldChunk = cb.getComponent(ref, WorldChunk.getComponentType());
-    if (worldChunk == null) {
-      return new WorldContext(null, null);
-    }
-    World world = worldChunk.getWorld();
-    return new WorldContext(worldChunk, world);
-  }
 
   // private Vector3i getBlockPosition(WorldChunk chunk, int chunkIndex) {
   // int x = ChunkUtil.xFromBlockInColumn(chunkIndex);

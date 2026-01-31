@@ -123,6 +123,7 @@ public class MusicToolInteraction extends SimpleInteraction {
 
         if (component.addAction(action)) {
           System.out.println("[MusicToolInteraction] Action added successfully");
+          this.store.addAncient(construct);
         } else {
           System.err.println("[MusicToolInteraction] Could not add action");
         }

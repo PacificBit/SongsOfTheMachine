@@ -51,7 +51,9 @@
     "VariantRotation": "NESW",
     "BlockEntity": {
       "Components": {
-        "AncientConstuctComponent": {}
+        "AncientConstuctComponent": {
+          "Command Timeout": 4
+        }
       }
     }
   },

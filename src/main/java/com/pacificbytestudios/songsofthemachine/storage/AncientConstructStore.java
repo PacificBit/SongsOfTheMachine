@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 public class AncientConstructStore {
   private static AncientConstructStore INSTANCE;
 
-  private Set<Ref<ChunkStore>> ancientConstuctComponents = new HashSet<>();
+  private Set<Ref<ChunkStore>> ancientConstuctWithPendingCommands = new HashSet<>();
   private Map<Ref<ChunkStore>, Set<Ref<ChunkStore>>> ancientConstructInChunk = new ConcurrentHashMap<>();
 
   private AncientConstructStore() {
@@ -25,17 +25,21 @@ public class AncientConstructStore {
   }
 
   public void addAncient(Ref<ChunkStore> ref) {
-    ancientConstuctComponents.add(ref);
+    ancientConstuctWithPendingCommands.add(ref);
   }
 
   public void removeAncient(Ref<ChunkStore> ref) {
-    if (ancientConstuctComponents.contains(ref)) {
-      ancientConstuctComponents.remove(ref);
+    if (ancientConstuctWithPendingCommands.contains(ref)) {
+      ancientConstuctWithPendingCommands.remove(ref);
     }
   }
 
-  public Set<Ref<ChunkStore>> getAncientConstuctComponents() {
-    return ancientConstuctComponents;
+  public Set<Ref<ChunkStore>> getAncientConstructsWithPendingCommands() {
+    return ancientConstuctWithPendingCommands;
+  }
+
+  public boolean hasPendingCommands(Ref<ChunkStore> entityRef) {
+    return this.ancientConstuctWithPendingCommands.contains(entityRef);
   }
 
   public void setAncientConstructChunkId(Ref<ChunkStore> chunkRef, Ref<ChunkStore> ancientConstructRef) {

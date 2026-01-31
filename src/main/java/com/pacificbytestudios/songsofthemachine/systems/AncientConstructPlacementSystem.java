@@ -26,14 +26,15 @@ public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
       AddReason reason,
       Store<ChunkStore> store,
       CommandBuffer<ChunkStore> commandBuffer) {
-    BlockModule.BlockStateInfo info = store.getComponent(ref, BlockModule.BlockStateInfo.getComponentType());
+    BlockModule.BlockStateInfo info = store.getComponent(ref,
+        BlockModule.BlockStateInfo.getComponentType());
     Ref<ChunkStore> chunkRef = info.getChunkRef();
     if (!chunkRef.isValid()) {
       System.err.println("[AncientConstructPlacementSystem] Could not find chunk during entity creation");
       return;
     }
 
-    this.store.addAncient(ref);
+    // this.store.addAncient(ref);
     this.store.setAncientConstructChunkId(chunkRef, ref);
 
     System.out.println("[AncientConstructPlacementSystem] Added new entity");

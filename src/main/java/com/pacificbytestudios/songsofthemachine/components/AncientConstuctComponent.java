@@ -9,10 +9,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
 import com.pacificbytestudios.songsofthemachine.SongsOfTheMachine;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructActions;
+import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 
 public class AncientConstuctComponent implements Component<ChunkStore> {
   private static final int BIT_ACTION_SIZE = 8;
-  private static final int ACTION_BUFFER_SIZE = 4;
   private static final int MASK_SLOT_0 = 0x000000FF;
   private static final int MASK_SLOT_1 = 0x0000FF00;
   private static final int MASK_SLOT_2 = 0x00FF0000;
@@ -24,37 +24,44 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
           (obj, value) -> obj.timeout = value,
           (obj) -> obj.timeout)
       .add()
+      .append(new KeyedCodec<>("RotationIndex", Codec.BYTE),
+          (obj, value) -> obj.rotationIndex = value,
+          (obj) -> obj.rotationIndex)
+      .add()
       .build();
 
-  private AncientConstructActions state;
+  private AncientConstructStatus status;
   private int actionBuffer;
   private byte actionCount;
   private float clock;
   private float timeout;
+  private byte rotationIndex;
+  private byte actionCapacity;
 
   public AncientConstuctComponent() {
     this.clock = 0f;
   }
 
-  public AncientConstructActions getState() {
-    return state;
-  }
-
-  public void setState(AncientConstructActions action) {
-    this.state = action;
-  }
-
   public boolean addAction(AncientConstructActions action) {
-    if (actionCount >= ACTION_BUFFER_SIZE) {
+    if (this.actionCount > this.actionCapacity) {
+      this.status = AncientConstructStatus.ERROR;
       return false;
     }
-    this.actionBuffer |= (action.getId() << (actionCount * BIT_ACTION_SIZE));
-    actionCount += 1;
+
+    this.actionBuffer |= (action.getId() << (this.actionCount * BIT_ACTION_SIZE));
+    this.actionCount += 1;
+
+    if (this.actionCount == this.actionCapacity) {
+      this.status = AncientConstructStatus.READY_TO_EXECUTE;
+    }
     return true;
   }
 
-  public boolean addTimeAndCheckIfTimeout(float deltaTime) {
+  public void addTime(float deltaTime) {
     this.clock += deltaTime;
+  }
+
+  public boolean resetClockIfTimeout() {
     if (this.clock >= this.timeout) {
       this.clock = 0f;
       return true;
@@ -62,17 +69,48 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     return false;
   }
 
-  public float getClock() {
+  public float getTime() {
     return this.clock;
   }
 
+  public void resetTime() {
+    this.clock = 0f;
+  }
+
+  public void setRotationIndex(byte rotation) {
+    this.rotationIndex = rotation;
+  }
+
+  public byte getRotationIndex(byte rotation) {
+    return this.rotationIndex;
+  }
+
   public void clearActionBuffer() {
+    this.status = AncientConstructStatus.IDLE;
     this.actionBuffer = 0;
     this.actionCount = 0;
+    this.clock = 0f;
   }
 
   public int getActionBuffer() {
     return this.actionBuffer;
+  }
+
+  public byte getActionCapacity() {
+    return actionCapacity;
+  }
+
+  public AncientConstructStatus getStatus() {
+    return this.status;
+  }
+
+  public void setStatus(AncientConstructStatus status) {
+    this.status = status;
+  }
+
+  public void setActionCapacity(byte actionCapacity) {
+    this.status = AncientConstructStatus.LISTENING;
+    this.actionCapacity = actionCapacity;
   }
 
   public AncientConstructActions[] getActions() {
@@ -89,6 +127,25 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     };
   }
 
+  public AncientConstructActions getNextAction() {
+    if (this.actionCount == 0) {
+      return null;
+    }
+    return AncientConstructActions.fromByte((byte) ((actionBuffer & MASK_SLOT_0) >>> 0));
+  }
+
+  public void clearNextAction() {
+    if (this.actionCount <= 0)
+      return;
+
+    this.actionBuffer = this.actionBuffer >>> BIT_ACTION_SIZE;
+    this.actionCount--;
+
+    if (this.actionCount == 0) {
+      this.status = AncientConstructStatus.COMEPLETED;
+    }
+  }
+
   public static ComponentType<ChunkStore, AncientConstuctComponent> getComponentType() {
     return SongsOfTheMachine.get().getAncientConstructorComponentType();
   }
@@ -96,10 +153,12 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
   @Override
   public AncientConstuctComponent clone() {
     AncientConstuctComponent c = new AncientConstuctComponent();
-    c.state = this.state;
+    c.status = this.status;
     c.actionBuffer = this.actionBuffer;
     c.actionCount = this.actionCount;
     c.timeout = this.timeout;
+    c.rotationIndex = this.rotationIndex;
     return c;
   }
+
 }

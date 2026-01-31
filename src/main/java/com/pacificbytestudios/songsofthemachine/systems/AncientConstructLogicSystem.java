@@ -6,23 +6,19 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
+import com.pacificbytestudios.songsofthemachine.enums.AncientConstructActions;
+import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
+import com.pacificbytestudios.songsofthemachine.utils.Utils;
+import com.pacificbytestudios.songsofthemachine.utils.Utils.WorldContext;
 
 public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore> {
   private AncientConstructStore store;
-
-  record WorldContext(
-      WorldChunk chunk,
-      World world) {
-    public boolean isValid() {
-      return chunk != null && world != null;
-    }
-  }
 
   public AncientConstructLogicSystem() {
     store = AncientConstructStore.get();
@@ -44,53 +40,101 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     AncientConstuctComponent construct = archetypeChunk.getComponent(
         index, AncientConstuctComponent.getComponentType());
 
-    BlockModule.BlockStateInfo info = archetypeChunk.getComponent(
-        index, BlockModule.BlockStateInfo.getComponentType());
+    if (construct == null) {
+      return;
+    }
 
-    if (construct == null || info == null) {
+    construct.addTime(deltaTime);
+
+    if (construct.getStatus() == AncientConstructStatus.READY_TO_EXECUTE) {
+      System.out.println("[AncientConstructLogicSystem] Executing command!");
+      construct.setStatus(AncientConstructStatus.EXECUTING);
+      construct.resetTime();
+      return;
+    } else if (construct.getStatus() == AncientConstructStatus.EXECUTING) {
+      AncientConstructActions action = construct.getNextAction();
+
+      if (construct.getTime() >= action.getExecutionTime()) {
+
+        BlockModule.BlockStateInfo info = chunkStore.getComponent(entityRef,
+            BlockModule.BlockStateInfo.getComponentType());
+        if (info != null) {
+          Utils.WorldContext context = Utils.getWorldContextFromInfo(cb, info);
+          System.out.println("[AncientConstructLogicSystem] " + context.toString());
+          Vector3i blockPos = Utils.getBlockPosition(context.getChunk(), info.getIndex());
+          execute(context, entityRef, construct, blockPos, action);
+        }
+        construct.clearNextAction();
+        construct.resetTime();
+        System.out.println("[AncientConstructLogicSystem] Done exucuting: " + action);
+      }
+
+      return;
+    } else if (construct.getStatus() == AncientConstructStatus.COMEPLETED) {
+      construct.clearActionBuffer();
+      this.store.removeAncient(entityRef);
       return;
     }
 
     System.out
-        .println("[AncientConstructLogicSystem] Entity " + entityRef.getIndex() + ", clock: " + construct.getClock());
+        .println("[AncientConstructLogicSystem] Entity " + entityRef.getIndex() + ", clock: " + construct.getTime());
 
-    if (construct.addTimeAndCheckIfTimeout(deltaTime)) {
+    if (construct.resetClockIfTimeout()) {
       this.store.removeAncient(entityRef);
       construct.clearActionBuffer();
       System.out.println("[AncientConstructLogicSystem] Entity command timeout");
     }
   }
 
-  // private void move(WorldContext context, BlockModule.BlockStateInfo info) {
-  // Vector3i currBlockPos = getBlockPosition(context.chunk, info.getIndex());
-  //
-  // if (currBlockPos.x > 20) {
-  // return;
-  // }
-  //
-  // BlockType type = context.chunk.getBlockType(currBlockPos);
-  // context.world.execute(() -> {
-  // int rotation = type.getRotationYawPlacementOffset().rotateY(1);
-  // context.chunk.breakBlock(currBlockPos.x, currBlockPos.y, currBlockPos.z);
-  //
-  // context.chunk.setBlock(
-  // currBlockPos.x + 1,
-  // currBlockPos.y,
-  // currBlockPos.z,
-  // BlockType.getAssetMap().getIndex(type.getId()),
-  // type,
-  // rotation,
-  // 0,
-  // 0);
-  // });
-  // }
+  private void execute(
+      Utils.WorldContext context,
+      Ref<ChunkStore> entityRef,
+      AncientConstuctComponent component,
+      Vector3i blockPos,
+      AncientConstructActions action) {
 
-  // private Vector3i getBlockPosition(WorldChunk chunk, int chunkIndex) {
-  // int x = ChunkUtil.xFromBlockInColumn(chunkIndex);
-  // int y = ChunkUtil.yFromBlockInColumn(chunkIndex);
-  // int z = ChunkUtil.zFromBlockInColumn(chunkIndex);
-  // return new Vector3i(x + (chunk.getX() << 5), y, z + (chunk.getZ() << 5));
-  // }
+    if (action == AncientConstructActions.IDLE)
+      return;
+
+    if (!context.isValid()) {
+      System.out.println("[AncientConstructLogicSystem] execute() - Invalid world context");
+      return;
+    }
+
+    if (action == AncientConstructActions.MOVE_FORWARD) {
+      moveForward(context, entityRef, blockPos);
+    }
+  }
+
+  private void moveForward(
+      Utils.WorldContext context,
+      Ref<ChunkStore> entityRef,
+      Vector3i blockPos) {
+
+    BlockType type = context.getChunk().getBlockType(blockPos);
+    context.getWorld().execute(() -> {
+      int rotation = type.getRotationYawPlacementOffset().rotateY(1);
+
+      context.getChunk()
+          .breakBlock(
+              blockPos.x,
+              blockPos.y,
+              blockPos.z);
+
+      System.out.println("[AncientConstructLogicSystem] move - Moving: " + blockPos);
+
+      context.getChunk().setBlock(
+          blockPos.x + 1,
+          blockPos.y,
+          blockPos.z,
+          BlockType.getAssetMap().getIndex(type.getId()),
+          type,
+          rotation,
+          0,
+          0);
+    });
+
+  }
 
   @Override
   public Query<ChunkStore> getQuery() {
@@ -98,4 +142,5 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         BlockModule.BlockStateInfo.getComponentType(),
         AncientConstuctComponent.getComponentType());
   }
+
 }

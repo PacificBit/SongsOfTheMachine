@@ -48,7 +48,8 @@
           "Action": {
             "Move Forward": true
           },
-          "Quality": 1
+          "Quality": 1,
+          "ActionsCapacity": 1
         }
       ]
     }

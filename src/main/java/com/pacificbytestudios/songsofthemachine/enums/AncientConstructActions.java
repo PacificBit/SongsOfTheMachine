@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum AncientConstructActions {
-  IDLE((byte) 0),
-  MOVE_FORWARD((byte) 1),
-  TURN_LEFT((byte) 2),
-  TURN_RIGHT((byte) 3),
-  BREAK_BLOCK((byte) 4);
+  IDLE((byte) 0, 1),
+  MOVE_FORWARD((byte) 1, 1),
+  TURN_LEFT((byte) 2, 1),
+  TURN_RIGHT((byte) 3, 1),
+  BREAK_BLOCK((byte) 4, 1);
 
   private static final Map<Byte, AncientConstructActions> BY_ID = new HashMap<>();
 
@@ -19,13 +19,19 @@ public enum AncientConstructActions {
   }
 
   private final byte id;
+  private final float executionTime; // in secs
 
-  AncientConstructActions(byte id) {
+  AncientConstructActions(byte id, float executionTime) {
     this.id = id;
+    this.executionTime = executionTime;
   }
 
   public byte getId() {
-    return id;
+    return this.id;
+  }
+
+  public float getExecutionTime() {
+    return this.executionTime;
   }
 
   public static AncientConstructActions fromByte(byte id) {

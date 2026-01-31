@@ -48,13 +48,16 @@
         }
       ]
     },
-    "VariantRotation": "NESW",
+    "VariantRotation": "None",
     "BlockEntity": {
       "Components": {
         "AncientConstuctComponent": {
           "Command Timeout": 4
         }
       }
+    },
+    "PlacementSettings": {
+      "BlockPreviewVisibility": "AlwaysHidden"
     }
   },
   "Tags": {

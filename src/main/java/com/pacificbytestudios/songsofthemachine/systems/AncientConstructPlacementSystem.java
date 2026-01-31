@@ -36,7 +36,6 @@ public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
 
     // this.store.addAncient(ref);
     this.store.setAncientConstructChunkId(chunkRef, ref);
-
     System.out.println("[AncientConstructPlacementSystem] Added new entity");
   }
 

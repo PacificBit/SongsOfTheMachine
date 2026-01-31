@@ -28,6 +28,7 @@ import com.pacificbytestudios.songsofthemachine.utils.Utils;
 
 public class MusicToolInteraction extends SimpleInteraction {
 
+  private static final byte MAX_CAPACITY = 4;
   public static final BuilderCodec<MusicToolInteraction> CODEC = BuilderCodec
       .builder(MusicToolInteraction.class, MusicToolInteraction::new, SimpleInteraction.CODEC)
       .append(
@@ -40,10 +41,16 @@ public class MusicToolInteraction extends SimpleInteraction {
           (obj, value) -> obj.quality = value,
           obj -> obj.quality)
       .add()
+      .append(
+          new KeyedCodec<>("ActionsCapacity", Codec.BYTE),
+          (obj, value) -> obj.actionCapacity = (byte) Math.min(value, MAX_CAPACITY),
+          obj -> obj.actionCapacity == null ? 1 : obj.actionCapacity)
+      .add()
       .build();
 
   private AncientConstructActions action;
   private byte quality;
+  private Byte actionCapacity;
   private AncientConstructStore store;
 
   public MusicToolInteraction() {
@@ -121,6 +128,11 @@ public class MusicToolInteraction extends SimpleInteraction {
         if (component == null)
           continue;
 
+        if (component.getActionCapacity() != this.actionCapacity) {
+          component.clearActionBuffer();
+          component.setActionCapacity(this.actionCapacity);
+        }
+
         if (component.addAction(action)) {
           System.out.println("[MusicToolInteraction] Action added successfully");
           this.store.addAncient(construct);
@@ -136,6 +148,7 @@ public class MusicToolInteraction extends SimpleInteraction {
     MusicToolInteraction tool = new MusicToolInteraction();
     tool.action = this.action;
     tool.quality = this.quality;
+    tool.actionCapacity = this.actionCapacity;
     return tool;
   }
 

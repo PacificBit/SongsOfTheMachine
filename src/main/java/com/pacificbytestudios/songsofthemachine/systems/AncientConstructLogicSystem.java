@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.protobuf.Empty;
 import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
-import com.hypixel.hytale.builtin.deployables.component.DeployableComponent;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -44,7 +42,12 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   private static final String FURNACE_ID = "Furnace";
   private static final String TANNERY_ID = "Tannery";
   private static final String EMPTY_BLOCK_ID = "Empty";
+
+  private static final int DIRECTION_BACK = -1;
+  private static final int DIRECTION_FORWARD = 1;
+
   private static final int MOVE_FWD_SFX_INDEX = SoundEvent.getAssetMap().getIndex("SFX_Cloth_Break");
+
   private static Map<String, short[]> OUTPUT_SLOTS = new HashMap<>();
   private AncientConstructStore store;
 
@@ -157,7 +160,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     }
 
     switch (action) {
-      case MOVE_FORWARD -> move(context, entityRef, blockPos);
+      case MOVE_FORWARD -> move(context, entityRef, blockPos, DIRECTION_FORWARD);
+      case MOVE_BACK -> move(context, entityRef, blockPos, DIRECTION_BACK);
       case TURN_LEFT -> turn(context, entityRef, blockPos, action);
       case TURN_RIGHT -> turn(context, entityRef, blockPos, action);
       case BASIC_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
@@ -172,7 +176,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   private void move(
       Utils.WorldContext context,
       Ref<ChunkStore> entityRef,
-      Vector3i blockPos) {
+      Vector3i blockPos,
+      int direction) {
     BlockType type = context.getChunk().getBlockType(blockPos);
 
     context.getWorld().execute(() -> {
@@ -182,9 +187,9 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       int zModifier = 0;
 
       if ((rotation & 1) == 0) {
-        zModifier = (rotation == 2) ? -1 : 1;
+        zModifier = ((rotation == 2) ? -1 : 1) * direction;
       } else {
-        xModifier = (rotation == 1) ? 1 : -1;
+        xModifier = ((rotation == 1) ? 1 : -1) * direction;
       }
 
       Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);

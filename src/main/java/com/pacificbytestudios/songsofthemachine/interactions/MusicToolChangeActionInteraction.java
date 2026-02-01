@@ -32,26 +32,19 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
       .build();
 
   private boolean changesToPrev;
+  private static int actionCount;
 
-  private static final AncientConstructAction[] ACTION_CYCLE = {
-      AncientConstructAction.IDLE,
-      AncientConstructAction.MOVE_FORWARD,
-      AncientConstructAction.TURN_LEFT,
-      AncientConstructAction.TURN_RIGHT,
-      AncientConstructAction.BASIC_BREAK_BLOCK,
-      AncientConstructAction.COMPLEX_BREAK_BLOCK,
-      AncientConstructAction.DROP_IN_CONTAINER,
-      AncientConstructAction.TAKE_OUTPUT_BENCH
-  };
-
-  private static final Map<AncientConstructAction, Integer> ACTION_INDEX = buildIndex(ACTION_CYCLE);
+  private static final Map<AncientConstructAction, Integer> ACTION_INDEX = buildIndex(AncientConstructAction.values());
 
   private static Map<AncientConstructAction, Integer> buildIndex(AncientConstructAction[] cycle) {
     EnumMap<AncientConstructAction, Integer> map = new EnumMap<>(AncientConstructAction.class);
 
     IntStream.range(0, cycle.length)
-        .forEach(i -> map.put(cycle[i], i));
+        .forEach(i -> {
+          map.put(cycle[i], i);
+        });
 
+    actionCount = cycle.length;
     return map;
   }
 
@@ -60,11 +53,10 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
     if (actionIndex == null) {
       actionIndex = 0;
     }
-    int n = ACTION_CYCLE.length;
-    int nextIdx = (actionIndex + delta) % n;
+    int nextIdx = (actionIndex + delta) % actionCount;
     if (nextIdx < 0)
-      nextIdx += n;
-    return ACTION_CYCLE[nextIdx];
+      nextIdx += actionCount;
+    return AncientConstructAction.values()[nextIdx];
   }
 
   public MusicToolChangeActionInteraction() {

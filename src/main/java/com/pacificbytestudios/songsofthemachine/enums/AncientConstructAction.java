@@ -4,14 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum AncientConstructAction {
-  IDLE((byte) 0, "Idle", 0.15f),
+  IDLE((byte) 0, "Idle", 0.25f),
   MOVE_FORWARD((byte) 1, "Advance", 0.25f),
-  TURN_LEFT((byte) 2, "Turn Left", 0.25f),
-  TURN_RIGHT((byte) 3, "Turn Right", 0.25f),
-  BASIC_BREAK_BLOCK((byte) 4, "Chisel", 0.25f),
-  COMPLEX_BREAK_BLOCK((byte) 5, "Excavate", 0.25f),
-  DROP_IN_CONTAINER((byte) 6, "Deposit", 0.25f),
-  TAKE_OUTPUT_BENCH((byte) 7, "Collect", 0.25f);
+  MOVE_BACK((byte) 2, "Retreat", 0.25f),
+  TURN_LEFT((byte) 3, "Turn Left", 0.25f),
+  TURN_RIGHT((byte) 4, "Turn Right", 0.25f),
+  BASIC_BREAK_BLOCK((byte) 5, "Chisel", 0.25f),
+  COMPLEX_BREAK_BLOCK((byte) 6, "Excavate", 0.25f),
+  DROP_IN_CONTAINER((byte) 7, "Deposit", 0.25f),
+  TAKE_OUTPUT_BENCH((byte) 8, "Collect", 0.25f);
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();

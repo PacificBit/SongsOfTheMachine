@@ -122,6 +122,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case TURN_RIGHT -> turn(context, entityRef, blockPos, action);
       case BASIC_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case COMPLEX_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
+      case DROP_IN_CHEST -> dropInChest(context, entityRef, blockPos);
       case IDLE -> {
       }
     }
@@ -298,6 +299,12 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         }
       }
     });
+  }
+
+  public void dropInChest(
+      Utils.WorldContext context,
+      Ref<ChunkStore> entityRef,
+      Vector3i blockPos) {
   }
 
   @Override

@@ -1,5 +1,10 @@
 package com.pacificbytestudios.songsofthemachine.interactions;
 
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.stream.IntStream;
+
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
@@ -12,6 +17,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 
@@ -19,10 +25,46 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
 
   public static final BuilderCodec<MusicToolChangeActionInteraction> CODEC = BuilderCodec
       .builder(MusicToolChangeActionInteraction.class, MusicToolChangeActionInteraction::new, SimpleInteraction.CODEC)
+      .append(new KeyedCodec<>("ChangesToPrevious", Codec.BOOLEAN),
+          (obj, value) -> obj.changesToPrev = value,
+          obj -> obj.changesToPrev)
+      .add()
       .build();
 
-  public static final KeyedCodec<MusicToolComponent> MUSIC_TOOL_KEY = new KeyedCodec<>("MusicToolComponent",
-      MusicToolComponent.CODEC);
+  private boolean changesToPrev;
+
+  private static final AncientConstructAction[] ACTION_CYCLE = {
+      AncientConstructAction.IDLE,
+      AncientConstructAction.MOVE_FORWARD,
+      AncientConstructAction.TURN_LEFT,
+      AncientConstructAction.TURN_RIGHT,
+      AncientConstructAction.BASIC_BREAK_BLOCK,
+      AncientConstructAction.COMPLEX_BREAK_BLOCK,
+      AncientConstructAction.DROP_IN_CHEST
+  };
+
+  private static final Map<AncientConstructAction, Integer> ACTION_INDEX = buildIndex(ACTION_CYCLE);
+
+  private static Map<AncientConstructAction, Integer> buildIndex(AncientConstructAction[] cycle) {
+    EnumMap<AncientConstructAction, Integer> map = new EnumMap<>(AncientConstructAction.class);
+
+    IntStream.range(0, cycle.length)
+        .forEach(i -> map.put(cycle[i], i));
+
+    return map;
+  }
+
+  private static AncientConstructAction step(AncientConstructAction current, int delta) {
+    Integer actionIndex = ACTION_INDEX.get(current);
+    if (actionIndex == null) {
+      actionIndex = 0;
+    }
+    int n = ACTION_CYCLE.length;
+    int nextIdx = (actionIndex + delta) % n;
+    if (nextIdx < 0)
+      nextIdx += n;
+    return ACTION_CYCLE[nextIdx];
+  }
 
   public MusicToolChangeActionInteraction() {
   }
@@ -41,43 +83,42 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
     world.execute(() -> {
       ItemStack current = context.getHeldItem();
 
-      MusicToolComponent comp = current.getFromMetadataOrDefault(MusicToolComponent.METADATA_KEY,
+      MusicToolComponent comp = current.getFromMetadataOrDefault(
+          MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC);
-      AncientConstructAction curr = comp.getAction() != null ? comp.getAction() : AncientConstructAction.IDLE;
 
-      switch (curr) {
-        case IDLE -> comp.setAction(AncientConstructAction.MOVE_FORWARD);
-        case MOVE_FORWARD -> comp.setAction(AncientConstructAction.TURN_LEFT);
-        case TURN_LEFT -> comp.setAction(AncientConstructAction.TURN_RIGHT);
-        case TURN_RIGHT -> comp.setAction(AncientConstructAction.BASIC_BREAK_BLOCK);
-        case BASIC_BREAK_BLOCK -> comp.setAction(AncientConstructAction.COMPLEX_BREAK_BLOCK);
-        case COMPLEX_BREAK_BLOCK -> comp.setAction(AncientConstructAction.IDLE);
-        default -> comp.setAction(AncientConstructAction.IDLE);
-      }
+      AncientConstructAction curr = (comp.getAction() != null)
+          ? comp.getAction()
+          : AncientConstructAction.IDLE;
 
-      world.sendMessage(Message.raw("Tool changed to: " + comp.getAction()));
+      int delta = this.changesToPrev ? -1 : 1;
+      AncientConstructAction next = step(curr, delta);
+      comp.setAction(next);
 
-      ItemStack updated = current.withMetadata(MusicToolComponent.METADATA_KEY, MusicToolComponent.CODEC,
+      world.sendMessage(Message.raw("Tool changed to: " + next.getName()));
+
+      ItemStack updated = current.withMetadata(
+          MusicToolComponent.METADATA_KEY,
+          MusicToolComponent.CODEC,
           comp);
 
       ItemStackSlotTransaction transaction = context.getHeldItemContainer()
           .setItemStackForSlot(context.getHeldItemSlot(), updated);
 
       if (!transaction.succeeded()) {
-        System.out.println("[MusicToolChangeAction] Could not complete slot transaction");
+        System.err.println("[MusicToolChangeAction] Could not complete slot transaction");
         return;
       }
 
       context.setHeldItem(updated);
-
-      System.out.println(
-          "[MusicToolChangeAction] New action: " + comp.getAction());
+      System.err.println("[MusicToolChangeAction] New action: " + next);
     });
   }
 
   @Override
   protected MusicToolChangeActionInteraction clone() {
     MusicToolChangeActionInteraction interaction = new MusicToolChangeActionInteraction();
+    interaction.changesToPrev = this.changesToPrev;
     return interaction;
   }
 

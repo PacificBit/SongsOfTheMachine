@@ -51,30 +51,32 @@
     }
   },
   "Interactions": {
-    "Secondary": {
-      "Interactions": [
-        {
-          "Type": "MusicToolUseInteraction",
-          "Action": {
-            "Move Forward": true
-          },
-          "Quality": 1,
-          "ActionsCapacity": 1
-        }
-      ],
-      "Cooldown": {
-        "Cooldown": 0.5
-      }
-    },
-    "Use": {
+    "Primary": {
       "Interactions": [
         {
           "Type": "MusicToolChangeAction"
         }
-      ],
-      "Cooldown": {
-        "Cooldown": 0.5
-      }
+      ]
+    },
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "MusicToolChangeAction",
+          "ChangesToPrevious": true
+        }
+      ]
+    },
+    "Use": {
+      "Interactions": [
+        {
+          "Type": "MusicToolUseInteraction",
+          "Quality": 1,
+          "ActionsCapacity": 1,
+          "Action": {
+            "Move Forward": true
+          }
+        }
+      ]
     }
   }
 }

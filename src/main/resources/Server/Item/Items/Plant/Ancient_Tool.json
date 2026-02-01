@@ -59,7 +59,7 @@
             "Move Forward": true
           },
           "Quality": 1,
-          "ActionsCapacity": 4
+          "ActionsCapacity": 1
         }
       ],
       "Cooldown": {

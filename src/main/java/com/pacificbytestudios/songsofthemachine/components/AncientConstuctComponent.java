@@ -3,15 +3,17 @@ package com.pacificbytestudios.songsofthemachine.components;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.inventory.container.EmptyItemContainer;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
 import com.pacificbytestudios.songsofthemachine.SongsOfTheMachine;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 
-public class AncientConstuctComponent implements Component<ChunkStore> {
+public class AncientConstuctComponent extends ItemContainerState {
   private static final int BIT_ACTION_SIZE = 8;
   private static final int MASK_SLOT_0 = 0x000000FF;
   private static final int MASK_SLOT_1 = 0x0000FF00;
@@ -24,6 +26,10 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
           (obj, value) -> obj.timeout = value,
           (obj) -> obj.timeout)
       .add()
+      .append(new KeyedCodec<>("Storage", ItemContainer.CODEC),
+          (obj, value) -> obj.storage = value,
+          (obj) -> obj.storage == null ? EmptyItemContainer.INSTANCE : obj.storage)
+      .add()
       .build();
 
   private AncientConstructStatus status;
@@ -32,6 +38,7 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
   private float clock;
   private float timeout;
   private byte actionCapacity;
+  private ItemContainer storage;
 
   public AncientConstuctComponent() {
     this.clock = 0f;
@@ -146,6 +153,7 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     c.actionCount = this.actionCount;
     c.timeout = this.timeout;
     c.actionCapacity = this.actionCapacity;
+    c.storage = this.storage;
     return c;
   }
 
@@ -156,6 +164,12 @@ public class AncientConstuctComponent implements Component<ChunkStore> {
     this.clock = other.clock;
     this.timeout = other.timeout;
     this.actionCapacity = other.actionCapacity;
+    this.storage = other.storage;
+  }
+
+  @Override
+  public ItemContainer getItemContainer() {
+    return this.storage == null ? EmptyItemContainer.INSTANCE : this.storage;
   }
 
 }

@@ -1,3 +1,4 @@
+
 {
   "TranslationProperties": {
     "Name": "server.construct.name",
@@ -54,8 +55,16 @@
     "BlockEntity": {
       "Components": {
         "AncientConstuctComponent": {
-          "Command Timeout": 4,
-          "Storage": {
+          "Command Timeout": 4
+        },
+        "container": {
+          "AllowViewing": true,
+          "Custom": true,
+          "Position": {
+            "X": 0,
+            "Y": 1
+          },
+          "ItemContainer": {
             "Capacity": 18
           }
         }
@@ -63,6 +72,34 @@
     },
     "PlacementSettings": {
       "BlockPreviewVisibility": "AlwaysVisible"
+    },
+    "State": {
+      "Id": "container",
+      "Capacity": 18,
+      "Definitions": {
+        "CloseWindow": {
+          "CustomModel": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl_Texture.png"
+            }
+          ],
+          "Material": "Solid",
+          "Opacity": "Transparent"
+        },
+        "OpenWindow": {
+          "CustomModel": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl_Texture.png",
+              "Weight": 1
+            }
+          ],
+          "Material": "Solid",
+          "Opacity": "Transparent"
+        }
+      }
     },
     "Interactions": {
       "Use": "Open_Container",

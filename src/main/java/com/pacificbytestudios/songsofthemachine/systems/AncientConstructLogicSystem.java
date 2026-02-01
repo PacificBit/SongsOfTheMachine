@@ -1,6 +1,7 @@
 package com.pacificbytestudios.songsofthemachine.systems;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -11,7 +12,10 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.modules.item.ItemModule;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
@@ -59,7 +63,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       construct.setStatus(AncientConstructStatus.EXECUTING);
       construct.resetTime();
       System.out.println("=======================================================");
-      System.out.println(Arrays.toString(construct.getActions()));
+      System.out.println("[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getActions()));
       return;
     } else if (construct.getStatus() == AncientConstructStatus.EXECUTING) {
       AncientConstructAction action = construct.getNextAction();
@@ -76,7 +80,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         construct.clearNextAction();
         construct.resetTime();
         System.out.println("[AncientConstructLogicSystem] Done exucuting: " + action);
-        System.out.println(Arrays.toString(construct.getActions()));
+        System.out
+            .println("[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getActions()));
         System.out.println(construct.getStatus());
       }
       return;
@@ -246,8 +251,18 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
       WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
 
-      BlockType type = chunk.getBlockType(newPos);
-      System.out.println("[AncientConstructLogicSystem] breakBlock - Block in front: " + type);
+      BlockType blockType = chunk.getBlockType(newPos);
+
+      String dropListId = blockType.getGathering().getBreaking().getDropListId();
+      List<ItemStack> itemStacks = ItemModule.get().getRandomItemDrops(dropListId);
+
+      AncientConstuctComponent component = entityRef.getStore().getComponent(entityRef,
+          AncientConstuctComponent.getComponentType());
+
+      ItemContainer storage = component.getItemContainer();
+      itemStacks.forEach(storage::addItemStack);
+
+      chunk.breakBlock(newPos.x, newPos.y, newPos.z);
     });
   }
 

@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.inventory.container.EmptyItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
@@ -14,6 +15,7 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 
 public class AncientConstuctComponent extends ItemContainerState {
+  private static final short STORAGE_CAPACITY = 18;
   private static final int BIT_ACTION_SIZE = 8;
   private static final int MASK_SLOT_0 = 0x000000FF;
   private static final int MASK_SLOT_1 = 0x0000FF00;
@@ -28,7 +30,7 @@ public class AncientConstuctComponent extends ItemContainerState {
       .add()
       .append(new KeyedCodec<>("Storage", ItemContainer.CODEC),
           (obj, value) -> obj.storage = value,
-          (obj) -> obj.storage == null ? EmptyItemContainer.INSTANCE : obj.storage)
+          (obj) -> obj.getItemContainer())
       .add()
       .build();
 
@@ -153,7 +155,7 @@ public class AncientConstuctComponent extends ItemContainerState {
     c.actionCount = this.actionCount;
     c.timeout = this.timeout;
     c.actionCapacity = this.actionCapacity;
-    c.storage = this.storage;
+    c.storage = EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new);
     return c;
   }
 
@@ -169,7 +171,8 @@ public class AncientConstuctComponent extends ItemContainerState {
 
   @Override
   public ItemContainer getItemContainer() {
-    return this.storage == null ? EmptyItemContainer.INSTANCE : this.storage;
+    return this.storage == null ? EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new)
+        : this.storage;
   }
 
 }

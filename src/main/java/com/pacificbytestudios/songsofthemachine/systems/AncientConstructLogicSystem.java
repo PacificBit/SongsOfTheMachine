@@ -3,8 +3,10 @@ package com.pacificbytestudios.songsofthemachine.systems;
 import java.util.Arrays;
 import java.util.List;
 
+import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
@@ -14,11 +16,15 @@ import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockBreakingDropType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockGathering;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.bench.Bench;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.interaction.BlockHarvestUtils;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule;
+import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
@@ -122,7 +128,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case TURN_RIGHT -> turn(context, entityRef, blockPos, action);
       case BASIC_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case COMPLEX_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
-      case DROP_IN_CHEST -> dropInChest(context, entityRef, blockPos);
+      case DROP_IN_CONTAINER -> dropInContainer(context, entityRef, blockPos);
       case IDLE -> {
       }
     }
@@ -145,8 +151,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       } else {
         xModifier = (rotation == 1) ? 1 : -1;
       }
-
-      System.out.println("[AncientConstructLogicSystem] moveForward - Moving: " + blockPos);
 
       Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
       WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
@@ -273,6 +277,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
           WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(x, z));
           if (chunk == null) {
+            System.err.println("[AncientConstructLogicSystem] breakBlock - Could not find chunk");
             continue;
           }
 
@@ -280,12 +285,16 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           BlockType blockType = chunk.getBlockType(newPos);
           BlockGathering gathering = blockType.getGathering();
           if (gathering == null) {
-            return;
+            System.err.println(
+                "[AncientConstructLogicSystem] breakBlock - Could not get gathering data for block at: " + newPos);
+            continue;
           }
 
           BlockBreakingDropType breaking = gathering.getBreaking();
           if (breaking == null) {
-            return;
+            System.err.println(
+                "[AncientConstructLogicSystem] breakBlock - Could not get breaking data for block at: " + newPos);
+            continue;
           }
 
           int quantity = breaking.getQuantity();
@@ -301,10 +310,60 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     });
   }
 
-  public void dropInChest(
+  public void dropInContainer(
       Utils.WorldContext context,
       Ref<ChunkStore> entityRef,
       Vector3i blockPos) {
+    context.getWorld().execute(() -> {
+      int rotation = context.getChunk().getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
+
+      int xModifier = 0;
+      int zModifier = 0;
+
+      if ((rotation & 1) == 0) {
+        zModifier = (rotation == 2) ? -1 : 1;
+      } else {
+        xModifier = (rotation == 1) ? 1 : -1;
+      }
+
+      Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
+      WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
+
+      AncientConstuctComponent component = entityRef.getStore().getComponent(entityRef,
+          AncientConstuctComponent.getComponentType());
+      ItemContainer constructStorage = component.getItemContainer();
+
+      if (chunk == null) {
+        System.err.println("[AncientConstructLogicSystem] dropInContainer - Could not find chunk");
+        return;
+      }
+
+      Ref<ChunkStore> newPosBlockRef = chunk.getBlockComponentEntity(newPos.x, newPos.y, newPos.z);
+      if (newPosBlockRef == null) {
+        System.err
+            .println(
+                "[AncientConstructLogicSystem] dropInContainer - Either no block in front or it has an invalid ref");
+        return;
+      }
+
+      BlockType blockType = chunk.getBlockType(newPos);
+      Bench blockTypeBench = blockType.getBench();
+      BlockState state = context.getWorld().getState(newPos.x, newPos.y, newPos.z, true);
+      if (blockType.getState() instanceof ItemContainerState.ItemContainerStateData) {
+        System.out.println("[AncientConstructLogicSystem] dropInContainer - Found container");
+        ComponentType<ChunkStore, ItemContainerState> containerComponentType = BlockStateModule.get()
+            .getComponentType(ItemContainerState.class);
+        ItemContainerState container = newPosBlockRef.getStore().getComponent(newPosBlockRef, containerComponentType);
+        constructStorage.moveAllItemStacksTo(container.getItemContainer());
+      } else if ((state instanceof ProcessingBenchState benchState) &&
+          blockTypeBench != null &&
+          blockTypeBench.equals(benchState.getBench()) &&
+          benchState.initialize(blockType)) {
+        System.out.println("[AncientConstructLogicSystem] dropInContainer - Found working bench");
+        constructStorage.moveAllItemStacksTo(benchState.getItemContainer());
+        benchState.setActive(true);
+      }
+    });
   }
 
   @Override

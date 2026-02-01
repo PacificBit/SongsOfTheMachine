@@ -40,7 +40,7 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
       AncientConstructAction.TURN_RIGHT,
       AncientConstructAction.BASIC_BREAK_BLOCK,
       AncientConstructAction.COMPLEX_BREAK_BLOCK,
-      AncientConstructAction.DROP_IN_CHEST
+      AncientConstructAction.DROP_IN_CONTAINER
   };
 
   private static final Map<AncientConstructAction, Integer> ACTION_INDEX = buildIndex(ACTION_CYCLE);

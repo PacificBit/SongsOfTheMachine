@@ -48,11 +48,16 @@ public class MusicToolUseInteraction extends SimpleInteraction {
           (obj, value) -> obj.actionCapacity = (byte) Math.min(value, MAX_CAPACITY),
           obj -> obj.actionCapacity == null ? 1 : obj.actionCapacity)
       .add()
+      .append(new KeyedCodec<>("IsLoopingInstrument", Codec.BOOLEAN),
+          (obj, value) -> obj.isLoopingInstrument = value,
+          obj -> obj.isLoopingInstrument)
+      .add()
       .build();
 
   private AncientConstructAction action;
   private byte quality;
   private Byte actionCapacity;
+  private boolean isLoopingInstrument;
   private AncientConstructStore store;
 
   public MusicToolUseInteraction() {
@@ -138,12 +143,17 @@ public class MusicToolUseInteraction extends SimpleInteraction {
 
           System.out.println("[MusicToolInteraction] Found AncientConstruct at: " + constructPos);
 
-          AncientConstuctComponent component = construct.getStore().getComponent(
-              construct,
+          AncientConstuctComponent component = construct.getStore().getComponent(construct,
               AncientConstuctComponent.getComponentType());
-          if (component == null || component.getStatus() != AncientConstructStatus.LISTENING)
-            continue;
 
+          if (component == null || !component.canBeInterrupted()) {
+            System.out.println("[MusicToolInteraction] Cannot interact with component");
+            System.out.println("Status " + component.getStatus() + " is looping " + component.getIsLooping());
+            continue;
+          }
+
+          component.setStatus(AncientConstructStatus.LISTENING);
+          component.setActionLoop(this.isLoopingInstrument);
           if (component.getActionCapacity() != this.actionCapacity) {
             component.clearActionBuffer();
             component.setActionCapacity(this.actionCapacity);
@@ -166,6 +176,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
     tool.action = this.action;
     tool.quality = this.quality;
     tool.actionCapacity = this.actionCapacity;
+    tool.isLoopingInstrument = this.isLoopingInstrument;
     return tool;
   }
 

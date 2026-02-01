@@ -92,7 +92,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
     if (construct.getStatus() == AncientConstructStatus.ERROR) {
       construct.clearActionBuffer();
-      construct.resetTime();
       construct.setStatus(AncientConstructStatus.LISTENING);
       this.store.removeAncient(entityRef);
       // TODO: add sound
@@ -107,7 +106,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       construct.setStatus(AncientConstructStatus.EXECUTING);
       construct.resetTime();
       System.out.println("=======================================================");
-      System.out.println("[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getActions()));
+      System.out.println(
+          "[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getRemainingActions()));
       return;
     } else if (construct.getStatus() == AncientConstructStatus.EXECUTING) {
       AncientConstructAction action = construct.getNextAction();
@@ -125,16 +125,15 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         construct.resetTime();
         System.out.println("[AncientConstructLogicSystem] Done exucuting: " + action);
         System.out
-            .println("[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getActions()));
+            .println(
+                "[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getRemainingActions()));
         System.out.println(construct.getStatus());
       }
       return;
     } else if (construct.getStatus() == AncientConstructStatus.COMPLETED) {
       System.out.println("[AncientConstructLogicSystem] Completed instruction set");
       construct.clearActionBuffer();
-      construct.resetTime();
       this.store.removeAncient(entityRef);
-      construct.setStatus(AncientConstructStatus.LISTENING);
       return;
     }
 

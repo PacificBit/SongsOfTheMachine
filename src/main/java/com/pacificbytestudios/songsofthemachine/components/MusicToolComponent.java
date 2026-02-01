@@ -19,6 +19,10 @@ public class MusicToolComponent implements Component<ChunkStore> {
       .add()
       .build();
 
+  public static ComponentType<ChunkStore, MusicToolComponent> getComponentType() {
+    return SongsOfTheMachine.get().getMusicToolComponentType();
+  }
+
   private AncientConstructAction action;
 
   public AncientConstructAction getAction() {
@@ -29,14 +33,11 @@ public class MusicToolComponent implements Component<ChunkStore> {
     this.action = action;
   }
 
-  public static ComponentType<ChunkStore, MusicToolComponent> getComponentType() {
-    return SongsOfTheMachine.get().getMusicToolComponentType();
-  }
-
   @Override
   public MusicToolComponent clone() {
     MusicToolComponent component = new MusicToolComponent();
     component.action = this.action;
     return component;
   }
+
 }

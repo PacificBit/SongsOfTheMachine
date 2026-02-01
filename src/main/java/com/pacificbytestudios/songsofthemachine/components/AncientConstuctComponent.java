@@ -35,8 +35,11 @@ public class AncientConstuctComponent extends ItemContainerState {
       .build();
 
   private AncientConstructStatus status;
+  private boolean loopActions;
   private int actionBuffer;
   private byte actionCount;
+  private int bkActionBuffer;
+  private byte bkActionCount;
   private float clock;
   private float timeout;
   private byte actionCapacity;
@@ -54,7 +57,9 @@ public class AncientConstuctComponent extends ItemContainerState {
     }
     int id = action.getId() & 0xFF;
     this.actionBuffer |= (id << (this.actionCount * BIT_ACTION_SIZE));
+    this.bkActionBuffer = actionBuffer;
     this.actionCount += 1;
+    this.bkActionCount = this.actionCount;
 
     if (this.actionCount == this.actionCapacity) {
       this.status = AncientConstructStatus.READY_TO_EXECUTE;
@@ -83,9 +88,12 @@ public class AncientConstuctComponent extends ItemContainerState {
   }
 
   public void clearActionBuffer() {
-    this.status = AncientConstructStatus.IDLE;
+    this.status = AncientConstructStatus.LISTENING;
     this.actionBuffer = 0;
+    this.bkActionBuffer = 0;
     this.actionCount = 0;
+    this.bkActionCount = 0;
+    this.loopActions = false;
     this.clock = 0f;
   }
 
@@ -95,6 +103,14 @@ public class AncientConstuctComponent extends ItemContainerState {
 
   public byte getActionCapacity() {
     return actionCapacity;
+  }
+
+  public void setActionLoop(boolean loopStatus) {
+    this.loopActions = loopStatus;
+  }
+
+  public boolean getIsLooping() {
+    return this.loopActions;
   }
 
   public AncientConstructStatus getStatus() {
@@ -110,7 +126,13 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.actionCapacity = actionCapacity;
   }
 
-  public AncientConstructAction[] getActions() {
+  public boolean canBeInterrupted() {
+    return this.status == AncientConstructStatus.LISTENING ||
+        this.status == AncientConstructStatus.IDLE ||
+        this.loopActions;
+  }
+
+  public AncientConstructAction[] getRemainingActions() {
     byte a0 = (byte) ((actionBuffer & MASK_SLOT_0) >>> 0);
     byte a1 = (byte) ((actionBuffer & MASK_SLOT_1) >>> 8);
     byte a2 = (byte) ((actionBuffer & MASK_SLOT_2) >>> 16);
@@ -139,6 +161,11 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.actionCount--;
 
     if (this.actionCount == 0) {
+      if (this.loopActions) {
+        this.actionCount = this.bkActionCount;
+        this.actionBuffer = this.bkActionBuffer;
+        return;
+      }
       this.status = AncientConstructStatus.COMPLETED;
     }
   }
@@ -155,6 +182,9 @@ public class AncientConstuctComponent extends ItemContainerState {
     c.actionCount = this.actionCount;
     c.timeout = this.timeout;
     c.actionCapacity = this.actionCapacity;
+    c.bkActionBuffer = this.bkActionBuffer;
+    c.bkActionCount = this.bkActionCount;
+    c.loopActions = this.loopActions;
     c.storage = EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new);
     return c;
   }
@@ -167,6 +197,9 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.timeout = other.timeout;
     this.actionCapacity = other.actionCapacity;
     this.storage = other.storage;
+    this.loopActions = other.loopActions;
+    this.bkActionBuffer = other.bkActionBuffer;
+    this.bkActionCount = other.bkActionCount;
   }
 
   @Override

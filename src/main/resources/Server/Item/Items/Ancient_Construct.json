@@ -54,7 +54,7 @@
     "BlockEntity": {
       "Components": {
         "AncientConstuctComponent": {
-          "Command Timeout": 4,
+          "Command Timeout": 40,
           "Storage": {
             "Capacity": 18
           }

@@ -100,7 +100,7 @@
             }
           },
           "Effects": {
-            "LocalSoundEventId": "SFX_Avatar_Powers_Enable_Local",
+            "LocalSoundEventId": "SFX_Avatar_Powers_Enable",
             "Particles": [
               {
                 "PositionOffset": {

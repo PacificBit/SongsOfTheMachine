@@ -22,7 +22,7 @@
     ]
   },
   "BlockType": {
-    "BlockParticleSetId": "Grass",
+    "BlockParticleSetId": "Crystal",
     "BlockSoundSetId": "Stone",
     "CustomModel": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl.blockymodel",
     "CustomModelTexture": [
@@ -67,7 +67,17 @@
     "Interactions": {
       "Use": "Open_Container",
       "Primary": "Break_Container"
-    }
+    },
+    "ParticleColor": "#121b1e",
+    "Particles": [
+      {
+        "SystemId": "Block_Run_Ice",
+        "PositionOffset": {
+          "Z": 0
+        },
+        "Scale": 2
+      }
+    ]
   },
   "Tags": {
     "Type": [

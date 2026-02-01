@@ -1,7 +1,9 @@
 package com.pacificbytestudios.songsofthemachine.systems;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -13,6 +15,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.protocol.BenchType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockBreakingDropType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockGathering;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
@@ -33,7 +36,17 @@ import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
 import com.pacificbytestudios.songsofthemachine.utils.Utils;
 
 public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore> {
+  private static final String FURNACE_ID = "Furnace";
+  private static final String TANNERY_ID = "Tannery";
+  private static Map<String, short[]> OUTPUT_SLOTS = new HashMap<>();
   private AncientConstructStore store;
+
+  static {
+    OUTPUT_SLOTS.put(FURNACE_ID + "1", new short[] { 3, 4, 5, 6 });
+    OUTPUT_SLOTS.put(FURNACE_ID + "2", new short[] { 4, 5, 6, 7 });
+    OUTPUT_SLOTS.put(TANNERY_ID + "1", new short[] { 2, 3 });
+    OUTPUT_SLOTS.put(TANNERY_ID + "2", new short[] { 3, 4, 5, 6 });
+  }
 
   public AncientConstructLogicSystem() {
     store = AncientConstructStore.get();
@@ -129,6 +142,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case BASIC_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case COMPLEX_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case DROP_IN_CONTAINER -> dropInContainer(context, entityRef, blockPos);
+      case TAKE_OUTPUT_BENCH -> takeBenchOutput(context, entityRef, blockPos);
       case IDLE -> {
       }
     }
@@ -362,6 +376,73 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         System.out.println("[AncientConstructLogicSystem] dropInContainer - Found working bench");
         constructStorage.moveAllItemStacksTo(benchState.getItemContainer());
         benchState.setActive(true);
+      }
+    });
+  }
+
+  private void takeBenchOutput(
+      Utils.WorldContext context,
+      Ref<ChunkStore> entityRef,
+      Vector3i blockPos) {
+    context.getWorld().execute(() -> {
+      int rotation = context.getChunk().getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
+
+      int xModifier = 0;
+      int zModifier = 0;
+
+      if ((rotation & 1) == 0) {
+        zModifier = (rotation == 2) ? -1 : 1;
+      } else {
+        xModifier = (rotation == 1) ? 1 : -1;
+      }
+
+      Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
+      WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
+
+      AncientConstuctComponent component = entityRef.getStore().getComponent(entityRef,
+          AncientConstuctComponent.getComponentType());
+      ItemContainer constructStorage = component.getItemContainer();
+
+      if (chunk == null) {
+        System.err.println("[AncientConstructLogicSystem] takeBenchOutput - Could not find chunk");
+        return;
+      }
+
+      Ref<ChunkStore> newPosBlockRef = chunk.getBlockComponentEntity(newPos.x, newPos.y, newPos.z);
+      if (newPosBlockRef == null) {
+        System.err
+            .println(
+                "[AncientConstructLogicSystem] takeBenchOutput - Either no block in front or it has an invalid ref");
+        return;
+      }
+
+      BlockType blockType = chunk.getBlockType(newPos);
+      Bench blockTypeBench = blockType.getBench();
+      BlockState state = context.getWorld().getState(newPos.x, newPos.y, newPos.z, true);
+
+      if ((state instanceof ProcessingBenchState benchState) &&
+          blockTypeBench != null &&
+          blockTypeBench.equals(benchState.getBench()) &&
+          benchState.initialize(blockType)) {
+        System.out.println("[AncientConstructLogicSystem] takeBenchOutput - Found working bench");
+
+        if (blockTypeBench.getType() != BenchType.Processing) {
+          System.err.println("[AncientConstructLogicSystem] takeBenchOutput - Is not a processing bench");
+          return;
+        }
+
+        String benchId = blockTypeBench.getId() + benchState.getTierLevel();
+        short[] outputSlots = OUTPUT_SLOTS.getOrDefault(benchId, null);
+        if (outputSlots == null) {
+          System.err.println(
+              "[AncientConstructLogicSystem] takeBenchOutput - Could not find output slot from output slot map, for id "
+                  + benchId);
+          return;
+        }
+
+        for (short slot : outputSlots) {
+          benchState.getItemContainer().moveItemStackFromSlot(slot, constructStorage);
+        }
       }
     });
   }

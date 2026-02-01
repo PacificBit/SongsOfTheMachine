@@ -10,7 +10,8 @@ public enum AncientConstructAction {
   TURN_RIGHT((byte) 3, "Turn Right", 0.25f),
   BASIC_BREAK_BLOCK((byte) 4, "Chisel", 0.25f),
   COMPLEX_BREAK_BLOCK((byte) 5, "Excavate", 0.25f),
-  DROP_IN_CONTAINER((byte) 6, "Deposit", 0.25f);
+  DROP_IN_CONTAINER((byte) 6, "Deposit", 0.25f),
+  TAKE_OUTPUT_BENCH((byte) 7, "Collect", 0.25f);
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();

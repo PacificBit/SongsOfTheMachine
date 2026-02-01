@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.protobuf.Empty;
 import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
+import com.hypixel.hytale.builtin.deployables.component.DeployableComponent;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -16,14 +18,17 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.BenchType;
+import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockBreakingDropType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockGathering;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.bench.Bench;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.interaction.BlockHarvestUtils;
+import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
 import com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule;
@@ -38,6 +43,8 @@ import com.pacificbytestudios.songsofthemachine.utils.Utils;
 public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore> {
   private static final String FURNACE_ID = "Furnace";
   private static final String TANNERY_ID = "Tannery";
+  private static final String EMPTY_BLOCK_ID = "Empty";
+  private static final int MOVE_FWD_SFX_INDEX = SoundEvent.getAssetMap().getIndex("SFX_Cloth_Break");
   private static Map<String, short[]> OUTPUT_SLOTS = new HashMap<>();
   private AncientConstructStore store;
 
@@ -80,6 +87,19 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
     construct.addTime(deltaTime);
 
+    if (construct.getStatus() == AncientConstructStatus.ERROR) {
+      construct.clearActionBuffer();
+      construct.resetTime();
+      construct.setStatus(AncientConstructStatus.LISTENING);
+      this.store.removeAncient(entityRef);
+      // TODO: add sound
+      // SoundUtil.playSoundEvent3d(MOVE_FWD_SFX_INDEX,
+      // SoundCategory.SFX,
+      // newPos.toVector3d(),
+      // context.getWorld().getEntityStore().getStore());
+
+    }
+
     if (construct.getStatus() == AncientConstructStatus.READY_TO_EXECUTE) {
       construct.setStatus(AncientConstructStatus.EXECUTING);
       construct.resetTime();
@@ -109,6 +129,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     } else if (construct.getStatus() == AncientConstructStatus.COMPLETED) {
       System.out.println("[AncientConstructLogicSystem] Completed instruction set");
       construct.clearActionBuffer();
+      construct.resetTime();
       this.store.removeAncient(entityRef);
       construct.setStatus(AncientConstructStatus.LISTENING);
       return;
@@ -136,7 +157,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     }
 
     switch (action) {
-      case MOVE_FORWARD -> moveForward(context, entityRef, blockPos);
+      case MOVE_FORWARD -> move(context, entityRef, blockPos);
       case TURN_LEFT -> turn(context, entityRef, blockPos, action);
       case TURN_RIGHT -> turn(context, entityRef, blockPos, action);
       case BASIC_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
@@ -148,7 +169,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     }
   }
 
-  private void moveForward(
+  private void move(
       Utils.WorldContext context,
       Ref<ChunkStore> entityRef,
       Vector3i blockPos) {
@@ -168,20 +189,34 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
       Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
       WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
+      AncientConstuctComponent oldComponent = entityRef.getStore().getComponent(entityRef,
+          AncientConstuctComponent.getComponentType());
 
       if (chunk == null) {
         System.out.println("[AncientConstructLogicSystem] moveForward - Invalid new chunk");
         return;
       }
 
-      if (!chunk.getBlockType(newPos).getId().equals("Empty")
-          || !chunk.getBlockType(newPos.clone().add(Vector3i.UP)).getId().equals("Empty")) {
+      if (!chunk.getBlockType(newPos.clone().add(Vector3i.UP)).getId().equals(EMPTY_BLOCK_ID)) {
         System.out.println("[AncientConstructLogicSystem] moveForward - Cannot move");
+        oldComponent.setStatus(AncientConstructStatus.ERROR);
         return;
       }
 
-      AncientConstuctComponent oldComponent = entityRef.getStore().getComponent(entityRef,
-          AncientConstuctComponent.getComponentType());
+      if (!chunk.getBlockType(newPos).getId().equals(EMPTY_BLOCK_ID)) {
+        newPos.add(Vector3i.UP);
+      }
+
+      Vector3i frontBottomBlock = newPos.clone().add(Vector3i.DOWN);
+      if (chunk.getBlockType(frontBottomBlock).getId().equals(EMPTY_BLOCK_ID)) {
+        if (!chunk.getBlockType(frontBottomBlock.add(Vector3i.DOWN)).getId().equals(EMPTY_BLOCK_ID)) {
+          newPos = frontBottomBlock.add(Vector3i.UP);
+        } else {
+          System.out.println("[AncientConstructLogicSystem] moveForward - Cannot move");
+          oldComponent.setStatus(AncientConstructStatus.ERROR);
+          return;
+        }
+      }
 
       context.getChunk()
           .breakBlock(
@@ -203,6 +238,11 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       AncientConstuctComponent newComponent = newEntityRef.getStore().getComponent(newEntityRef,
           AncientConstuctComponent.getComponentType());
       newComponent.copyFrom(oldComponent);
+
+      SoundUtil.playSoundEvent3d(MOVE_FWD_SFX_INDEX,
+          SoundCategory.SFX,
+          newPos.toVector3d(),
+          context.getWorld().getEntityStore().getStore());
 
       this.store.removeAncient(entityRef);
       this.store.addAncient(newEntityRef);

@@ -1,5 +1,4 @@
 construct.name=Ancient Construct
 construct.description=Does not obey commands — it listens, remembers, and turns sound into motion.
-tools.poor_quality.tool.name=Poor Quality Tool
-tools.poor_quality.tool.description=Command Ancient Construct in a range 16x16
-tools.interaction_hint=Press f to change action
+controlstaff.poorquality.name=Onyxium (Poor Quality)
+controlstaff.poorquality.description=Command Ancient Construct in a range 16x16

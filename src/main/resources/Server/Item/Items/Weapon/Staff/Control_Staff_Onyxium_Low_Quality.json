@@ -38,26 +38,66 @@
     "Primary": {
       "Interactions": [
         {
-          "Type": "MusicToolChangeAction"
+          "Type": "Simple",
+          "Effects": {
+            "FirstPersonParticles": [
+              {
+                "SystemId": "E_Sphere_Old",
+                "PositionOffset": {
+                  "Z": 2.8
+                }
+              }
+            ],
+            "ItemPlayerAnimationsId": "Skeleton_Spear",
+            "ItemAnimationId": "SpinSwingRightHeavy",
+            "ClearAnimationOnFinish": true,
+            "LocalSoundEventId": "SFX_Spear_Lunge_Local"
+          },
+          "Next": {
+            "Type": "MusicToolChangeAction"
+          },
+          "RunTime": 0.4
         }
       ]
     },
     "Secondary": {
       "Interactions": [
         {
-          "Type": "MusicToolChangeAction",
-          "ChangesToPrevious": true
+          "Type": "Simple",
+          "Next": {
+            "Type": "MusicToolChangeAction",
+            "ChangesToPrevious": true
+          },
+          "Effects": {
+            "LocalSoundEventId": "SFX_Spear_Lunge_Local",
+            "ItemPlayerAnimationsId": "Skeleton_Spear",
+            "ItemAnimationId": "SpinSwingLeftHeavy",
+            "ClearAnimationOnFinish": true,
+            "FirstPersonParticles": [
+              {
+                "SystemId": "E_Sphere_Old",
+                "PositionOffset": {
+                  "Z": 2.8
+                }
+              }
+            ]
+          },
+          "RunTime": 0.4
         }
       ]
     },
     "Use": {
       "Interactions": [
         {
-          "Type": "MusicToolUseInteraction",
-          "Quality": 1,
-          "ActionsCapacity": 1,
-          "Action": {
-            "Move Forward": true
+          "Type": "Simple",
+          "RunTime": 0.15,
+          "Next": {
+            "Type": "MusicToolUseInteraction",
+            "Quality": 1,
+            "ActionsCapacity": 1,
+            "Action": {
+              "Move Forward": true
+            }
           },
           "Effects": {
             "LocalSoundEventId": "SFX_Avatar_Powers_Enable_Local",
@@ -65,7 +105,7 @@
               {
                 "PositionOffset": {
                   "X": 2.8,
-                  "Y": 0
+                  "Y": -1.5
                 },
                 "RotationOffset": {
                   "Pitch": 0,
@@ -73,17 +113,17 @@
                   "Roll": 0
                 },
                 "TargetNodeName": "Handle",
-                "SystemId": "MagicPortal_Stones",
-                "TargetEntityPart": "PrimaryItem",
-                "DetachedFromModel": false
+                "SystemId": "Ice_Blast",
+                "TargetEntityPart": "Self",
+                "DetachedFromModel": false,
+                "Color": "#17f056",
+                "Scale": 1.5
               }
             ],
             "ItemPlayerAnimationsId": "Stick",
             "ItemAnimationId": "Cast_Magic",
             "ClearAnimationOnFinish": true
-          },
-          "RunTime": 0.25,
-          "CancelOnItemChange": true
+          }
         }
       ]
     }

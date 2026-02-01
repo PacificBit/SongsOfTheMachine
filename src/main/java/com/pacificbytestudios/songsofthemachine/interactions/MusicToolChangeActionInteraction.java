@@ -49,8 +49,9 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
         case IDLE -> comp.setAction(AncientConstructAction.MOVE_FORWARD);
         case MOVE_FORWARD -> comp.setAction(AncientConstructAction.TURN_LEFT);
         case TURN_LEFT -> comp.setAction(AncientConstructAction.TURN_RIGHT);
-        case TURN_RIGHT -> comp.setAction(AncientConstructAction.BREAK_BLOCK);
-        case BREAK_BLOCK -> comp.setAction(AncientConstructAction.IDLE);
+        case TURN_RIGHT -> comp.setAction(AncientConstructAction.BASIC_BREAK_BLOCK);
+        case BASIC_BREAK_BLOCK -> comp.setAction(AncientConstructAction.COMPLEX_BREAK_BLOCK);
+        case COMPLEX_BREAK_BLOCK -> comp.setAction(AncientConstructAction.IDLE);
         default -> comp.setAction(AncientConstructAction.IDLE);
       }
 

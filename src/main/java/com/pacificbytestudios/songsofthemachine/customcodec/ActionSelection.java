@@ -21,8 +21,12 @@ public class ActionSelection {
           (obj, value) -> obj.action = AncientConstructAction.TURN_RIGHT,
           (obj) -> true)
       .add()
-      .append(new KeyedCodec<>("Break Block", Codec.BOOLEAN),
-          (obj, value) -> obj.action = AncientConstructAction.BREAK_BLOCK,
+      .append(new KeyedCodec<>("Basic Break Block", Codec.BOOLEAN),
+          (obj, value) -> obj.action = AncientConstructAction.BASIC_BREAK_BLOCK,
+          (obj) -> true)
+      .add()
+      .append(new KeyedCodec<>("Complex Break Block", Codec.BOOLEAN),
+          (obj, value) -> obj.action = AncientConstructAction.COMPLEX_BREAK_BLOCK,
           (obj) -> true)
       .add()
       .build();

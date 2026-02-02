@@ -95,7 +95,7 @@ Group #DebugRoot {
 
 
 Group #ActionBuffer {
-  Anchor: (Left: 975, Top: 840, Width: 100, Height: 40);
+  Anchor: (Left: 1450, Top: 880, Width: 100, Height: 40);
   LayoutMode: Left;
 
   Group #ActionSlot1 {

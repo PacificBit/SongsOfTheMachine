@@ -103,28 +103,21 @@
           },
           "Effects": {
             "LocalSoundEventId": "SFX_SOTM_Track_2",
-            "Particles": [
-              {
-                "PositionOffset": {
-                  "X": 2.8,
-                  "Y": -1.5
-                },
-                "RotationOffset": {
-                  "Pitch": 0,
-                  "Yaw": -90,
-                  "Roll": 0
-                },
-                "TargetNodeName": "Handle",
-                "SystemId": "Ice_Blast",
-                "TargetEntityPart": "Self",
-                "DetachedFromModel": false,
-                "Color": "#17f056",
-                "Scale": 1.5
-              }
-            ],
             "ItemPlayerAnimationsId": "Stick",
             "ItemAnimationId": "Cast_Magic",
-            "ClearAnimationOnFinish": true
+            "ClearAnimationOnFinish": true,
+            "FirstPersonParticles": [
+              {
+                "SystemId": "Ice_Blast",
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Handle",
+                "Color": "#17f056",
+                "PositionOffset": {
+                  "Y": 1.6,
+                  "Z": 2
+                }
+              }
+            ]
           }
         }
       ]

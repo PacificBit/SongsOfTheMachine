@@ -156,6 +156,10 @@ public class MusicToolUseInteraction extends SimpleInteraction {
             continue;
           }
 
+          if (ancientConstruct.getStatus() != AncientConstructStatus.LISTENING) {
+            ancientConstruct.clearActionBuffer();
+          }
+
           ancientConstruct.setStatus(AncientConstructStatus.LISTENING);
           ancientConstruct.setActionLoop(this.isLoopingInstrument);
           if (ancientConstruct.getActionCapacity() != this.actionCapacity) {

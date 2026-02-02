@@ -130,7 +130,7 @@ public class AncientConstuctComponent extends ItemContainerState {
   }
 
   public int getBufferLoad() {
-    return Byte.toUnsignedInt(this.actionCount);
+    return this.actionCount;
   }
 
   public void setActionCapacity(byte actionCapacity) {

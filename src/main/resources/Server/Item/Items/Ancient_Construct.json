@@ -5,7 +5,7 @@
   },
   "PlayerAnimationsId": "Block",
   "Categories": [
-    "Blocks.Structural"
+    "Items.Tools"
   ],
   "Set": "Furniture_Temple_Dark",
   "Icon": "Icons/ItemsGenerated/Furniture_Temple_Dark_Statue.png",
@@ -95,5 +95,30 @@
     ]
   },
   "ItemSoundSetId": "ISS_Blocks_Wood",
-  "MaxStack": 1
+  "MaxStack": 1,
+  "Recipe": {
+    "BenchRequirement": [
+      {
+        "Categories": [
+          "Arcane_Misc"
+        ],
+        "Id": "Arcanebench"
+      }
+    ],
+    "Input": [
+      {
+        "ItemId": "Ingredient_Bar_Cobalt",
+        "Quantity": 25
+      },
+      {
+        "ItemId": "Rock_Gem_Emerald",
+        "Quantity": 2
+      },
+      {
+        "ItemId": "Potion_Mana_Large",
+        "Quantity": 4
+      }
+    ],
+    "TimeSeconds": 12
+  }
 }

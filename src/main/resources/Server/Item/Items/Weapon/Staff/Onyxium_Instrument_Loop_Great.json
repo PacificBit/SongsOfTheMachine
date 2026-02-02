@@ -94,7 +94,7 @@
           "RunTime": 0.15,
           "Next": {
             "Type": "MusicToolUseInteraction",
-            "Quality": 1,
+            "Quality": 2,
             "ActionsCapacity": 4,
             "Action": {
               "Move Forward": true
@@ -141,5 +141,34 @@
       }
     ],
     "DrawType": "Model"
+  },
+  "Recipe": {
+    "BenchRequirement": [
+      {
+        "Id": "Arcanebench",
+        "Categories": [
+          "Arcane_Misc"
+        ]
+      }
+    ],
+    "Input": [
+      {
+        "ItemId": "Ingredient_Crystal_White",
+        "Quantity": 20
+      },
+      {
+        "ItemId": "Ingredient_Bar_Adamantite",
+        "Quantity": 32
+      },
+      {
+        "ItemId": "Wood_Azure_Trunk",
+        "Quantity": 10
+      },
+      {
+        "ItemId": "Ingredient_Void_Essence",
+        "Quantity": 45
+      }
+    ],
+    "TimeSeconds": 12
   }
 }

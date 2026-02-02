@@ -93,7 +93,7 @@
           "RunTime": 0.15,
           "Next": {
             "Type": "MusicToolUseInteraction",
-            "Quality": 1,
+            "Quality": 2,
             "ActionsCapacity": 4,
             "Action": {
               "Move Forward": true
@@ -129,5 +129,34 @@
     }
   },
   "MaxStack": 1,
-  "Scale": 1
+  "Scale": 1,
+  "Recipe": {
+    "Input": [
+      {
+        "ItemId": "Rock_Gem_Emerald",
+        "Quantity": 3
+      },
+      {
+        "ItemId": "Ingredient_Bar_Adamantite",
+        "Quantity": 32
+      },
+      {
+        "ItemId": "Wood_Azure_Trunk",
+        "Quantity": 10
+      },
+      {
+        "ItemId": "Ingredient_Void_Essence",
+        "Quantity": 30
+      }
+    ],
+    "BenchRequirement": [
+      {
+        "Id": "Arcanebench",
+        "Categories": [
+          "Arcane_Misc"
+        ]
+      }
+    ],
+    "TimeSeconds": 12
+  }
 }

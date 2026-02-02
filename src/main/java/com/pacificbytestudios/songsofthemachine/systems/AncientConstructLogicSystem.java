@@ -46,8 +46,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   private static final int DIRECTION_BACK = -1;
   private static final int DIRECTION_FORWARD = 1;
 
-  private static final int MOVE_FWD_SFX_INDEX = SoundEvent.getAssetMap().getIndex("SFX_Cloth_Break");
-
   private static Map<String, short[]> OUTPUT_SLOTS = new HashMap<>();
   private AncientConstructStore store;
 

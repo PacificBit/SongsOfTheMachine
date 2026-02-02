@@ -1,7 +1,7 @@
 @Container = (TexturePath: "../Common/DropdownBox.png", Border: 20);
 @Empty = #000000(0.0);
-@Active = (TexturePath: "../Common/ScrollbarHandleHovered.png", Border: 3);
-@NotActive = (TexturePath: "../Common/ScrollbarHandleDragged.png", Border: 3);
+@Active = (TexturePath: "../Common/ScrollbarHandleHovered.png", Border: 0);
+@NotActive = (TexturePath: "../Common/ScrollbarHandleDragged.png", Border: 0);
 
 
 
@@ -93,28 +93,53 @@ Group #DebugRoot {
   }
 }
 
+
 Group #ActionBuffer {
-  Anchor: (Left: 1200, Top: 800, Width: 100, Height: 40);
+  Anchor: (Left: 975, Top: 840, Width: 100, Height: 40);
   LayoutMode: Left;
 
-  Group #Action1 {
-    Background: @NotActive;
-    Anchor: (Width: 10, Height: 10);
-    Padding: (Full: 1);
+  Group #ActionSlot1 {
+    Anchor: (Width: 30, Height: 40);
+    Padding: (Full: 12);
+
+    Group #Action1 {
+      Background: @NotActive;
+      Anchor: (Width: 20, Height: 20);
+    Padding: (Full: 12);
+    }
   }
-  Group #Action2 {
-    Background: @NotActive;
-    Anchor: (Width: 10, Height: 10);
-    Padding: (Full: 1);
+
+  Group #ActionSlot2 {
+    Anchor: (Width: 30, Height: 40);
+    Padding: (Full: 12);
+
+    Group #Action2 {
+      Background: @NotActive;
+      Anchor: (Width: 20, Height: 20);
+    Padding: (Full: 12);
+    }
   }
-  Group #Action3 {
-    Background: @NotActive;
-    Anchor: (Width: 10, Height: 10);
-    Padding: (Full: 1);
+
+  Group #ActionSlot3 {
+    Anchor: (Width: 30, Height: 40);
+    Padding: (Full: 12);
+
+    Group #Action3 {
+      Background: @NotActive;
+      Anchor: (Width: 20, Height: 20);
+    Padding: (Full: 12);
+    }
   }
-  Group #Action4 {
-    Background: @NotActive;
-    Anchor: (Width: 10, Height: 10);
-    Padding: (Full: 1);
+
+  Group #ActionSlot4 {
+    Anchor: (Width: 30, Height: 40);
+    Padding: (Full: 12);
+
+    Group #Action4 {
+      Background: @NotActive;
+      Anchor: (Width: 20, Height: 20);
+    Padding: (Full: 12);
+    }
   }
 }
+

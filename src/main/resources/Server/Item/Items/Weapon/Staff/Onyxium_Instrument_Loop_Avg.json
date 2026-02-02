@@ -1,12 +1,12 @@
 {
   "TranslationProperties": {
-    "Name": "server.controlstaff.poorquality.name",
-    "Description": "server.controlstaff.poorquality.description"
+    "Name": "server.music_instrument.loop.avg.name",
+    "Description": "server.music_instrument.loop.avg.description"
   },
   "Categories": [
     "Items.Tools"
   ],
-  "Quality": "Common",
+  "Quality": "Epic",
   "ItemLevel": 40,
   "PlayerAnimationsId": "Staff",
   "IconProperties": {

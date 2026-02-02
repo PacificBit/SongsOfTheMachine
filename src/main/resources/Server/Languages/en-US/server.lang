@@ -1,4 +1,20 @@
 construct.name=Ancient Construct
 construct.description=Does not obey commands — it listens, remembers, and turns sound into motion.
-controlstaff.poorquality.name=Onyxium (Poor Quality)
-controlstaff.poorquality.description=Command Ancient Construct in a range 16x16
+
+music_instrument.loop.low.name=Curse of Note
+music_instrument.loop.low.description=Binds a single echo to the construct. It keeps repeating the action.
+
+music_instrument.loop.avg.name=Curse of Phrase
+music_instrument.loop.avg.description=Binds a short sequence of echoes. The construct repeats it over time.
+
+music_instrument.loop.great.name=Curse of Measure
+music_instrument.loop.great.description=Binds a full measure of echoes. The construct remembers and repeats it endlessly.
+
+music_instrument.single.low.name=Incantation of Note
+music_instrument.single.low.description=Plays a single echo. The construct listens and responds once.
+
+music_instrument.single.avg.name=Incantation of Phrase
+music_instrument.single.avg.description=Plays a short sequence of echoes. The construct responds briefly.
+
+music_instrument.single.great.name=Incantation of Measure
+music_instrument.single.great.description=Plays a full measure of echoes. The construct responds, then falls silent.

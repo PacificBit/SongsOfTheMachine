@@ -1,7 +1,7 @@
 {
   "TranslationProperties": {
-    "Name": "server.controlstaff.poorquality.name",
-    "Description": "server.controlstaff.poorquality.description"
+    "Name": "server.music_instrument.single.low.name",
+    "Description": "server.music_instrument.single.low.description"
   },
   "Categories": [
     "Items.Tools"

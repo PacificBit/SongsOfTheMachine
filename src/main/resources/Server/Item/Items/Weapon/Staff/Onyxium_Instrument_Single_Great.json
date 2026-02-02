@@ -1,12 +1,12 @@
 {
   "TranslationProperties": {
-    "Name": "server.controlstaff.poorquality.name",
-    "Description": "server.controlstaff.poorquality.description"
+    "Name": "server.music_instrument.single.great.name",
+    "Description": "server.music_instrument.single.great.description"
   },
   "Categories": [
     "Items.Tools"
   ],
-  "Quality": "Common",
+  "Quality": "Rare",
   "ItemLevel": 40,
   "Model": "Items/Weapons/Staff/Onyxium.blockymodel",
   "Texture": "Items/Weapons/Staff/Onyxium_Texture.png",

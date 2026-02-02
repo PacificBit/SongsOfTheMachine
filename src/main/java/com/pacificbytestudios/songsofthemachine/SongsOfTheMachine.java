@@ -1,7 +1,7 @@
 package com.pacificbytestudios.songsofthemachine;
 
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 import com.hypixel.hytale.server.core.io.adapter.PacketFilter;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
+import com.pacificbytestudios.songsofthemachine.events.PlayerReadyHandler;
 import com.pacificbytestudios.songsofthemachine.interactions.MusicToolChangeActionInteraction;
 import com.pacificbytestudios.songsofthemachine.interactions.MusicToolUseInteraction;
 import com.pacificbytestudios.songsofthemachine.systems.AncientConstructLogicSystem;
@@ -18,14 +19,12 @@ import com.pacificbytestudios.songsofthemachine.watcher.PlayerHotbarWatcher;
 
 public final class SongsOfTheMachine extends JavaPlugin {
   private static SongsOfTheMachine INSTANCE;
-  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private ComponentType<ChunkStore, AncientConstuctComponent> ancientConstructorComponentType;
   private ComponentType<ChunkStore, MusicToolComponent> musicToolComponentType;
   private PacketFilter packetFilter;
 
-  public SongsOfTheMachine(JavaPluginInit init) {
+  public SongsOfTheMachine(final JavaPluginInit init) {
     super(init);
-    LOGGER.atInfo().log("Hello from %s version %s", this.getName(), this.getManifest().getVersion().toString());
     INSTANCE = this;
   }
 
@@ -57,6 +56,9 @@ public final class SongsOfTheMachine extends JavaPlugin {
 
     this.packetFilter = PacketAdapters.registerInbound(new PlayerHotbarWatcher());
     System.out.println("[SongsOfTheMachine] Registered player hotbar watcher");
+
+    this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerReadyHandler::handle);
+    System.out.println("[SongsOfTheMachine] Registered player ready handler");
   }
 
   @Override
@@ -64,7 +66,6 @@ public final class SongsOfTheMachine extends JavaPlugin {
     if (this.packetFilter != null) {
       PacketAdapters.deregisterInbound(this.packetFilter);
     }
-
   }
 
   public ComponentType<ChunkStore, AncientConstuctComponent> getAncientConstructorComponentType() {

@@ -14,6 +14,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.util.ChunkUtil;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.BenchType;
 import com.hypixel.hytale.protocol.SoundCategory;
@@ -42,6 +43,13 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   private static final String FURNACE_ID = "Furnace";
   private static final String TANNERY_ID = "Tannery";
   private static final String EMPTY_BLOCK_ID = "Empty";
+
+  private static final String ERROR_SOUND_ID = "SFX_SOTM_Construct_Error";
+  private static final String MOVE_SOUND_ID = "SFX_SOTM_Construct_Move";
+  private static final String TURN_LEFT_SOUND_ID = "SFX_SOTM_Turn_Left";
+  private static final String TURN_RIGHT_SOUND_ID = "SFX_SOTM_Turn_Right";
+  private static final String BREAK_SOUND_ID = "SFX_Stone_Break";
+  private static final String OPEN_CONTAINER_SOUND_ID = "SFX_Chest_Wooden_Open";
 
   private static final int DIRECTION_BACK = -1;
   private static final int DIRECTION_FORWARD = 1;
@@ -92,13 +100,19 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       construct.clearActionBuffer();
       construct.setStatus(AncientConstructStatus.LISTENING);
       this.store.removeAncient(entityRef);
-      // TODO: add sound
-      // SoundUtil.playSoundEvent3d(MOVE_FWD_SFX_INDEX,
-      // SoundCategory.SFX,
-      // newPos.toVector3d(),
-      // context.getWorld().getEntityStore().getStore());
-      // SFX_Avatar_Powers_Enable
 
+      BlockModule.BlockStateInfo info = chunkStore.getComponent(entityRef,
+          BlockModule.BlockStateInfo.getComponentType());
+      Utils.WorldContext context = Utils.getWorldContextFromInfo(cb, info);
+
+      context.getWorld().execute(() -> {
+        Vector3i blockPos = Utils.getBlockPosition(context.getChunk(), info.getIndex());
+        int soundIndex = SoundEvent.getAssetMap().getIndex(ERROR_SOUND_ID);
+        SoundUtil.playSoundEvent3d(soundIndex,
+            SoundCategory.SFX,
+            blockPos.toVector3d(),
+            context.getWorld().getEntityStore().getStore());
+      });
     }
 
     if (construct.getStatus() == AncientConstructStatus.READY_TO_EXECUTE) {
@@ -242,7 +256,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           AncientConstuctComponent.getComponentType());
       newComponent.copyFrom(oldComponent);
 
-      int index = SoundEvent.getAssetMap().getIndex("SFX_SOTM_Construct_Move");
+      int index = SoundEvent.getAssetMap().getIndex(MOVE_SOUND_ID);
       SoundUtil.playSoundEvent3d(index,
           SoundCategory.SFX,
           newPos.toVector3d(),
@@ -270,6 +284,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
       rotation += (action == AncientConstructAction.TURN_LEFT) ? 1 : -1;
       rotation = (rotation + 4) % 4;
+      String soundId = (action == AncientConstructAction.TURN_LEFT) ? TURN_LEFT_SOUND_ID : TURN_RIGHT_SOUND_ID;
 
       AncientConstuctComponent oldComponent = entityRef.getStore().getComponent(entityRef,
           AncientConstuctComponent.getComponentType());
@@ -292,6 +307,12 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       AncientConstuctComponent newComponent = newEntityRef.getStore().getComponent(newEntityRef,
           AncientConstuctComponent.getComponentType());
       newComponent.copyFrom(oldComponent);
+
+      int index = SoundEvent.getAssetMap().getIndex(soundId);
+      SoundUtil.playSoundEvent3d(index,
+          SoundCategory.SFX,
+          blockPos.toVector3d(),
+          context.getWorld().getEntityStore().getStore());
 
       this.store.removeAncient(entityRef);
       this.store.addAncient(newEntityRef);
@@ -326,6 +347,10 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
       int lateralStart = -((width - 1) / 2);
       int lateralEnd = (width / 2);
+
+      int lateralCount = (lateralEnd - lateralStart + 1);
+      Vector3d[] brokenBlocks = new Vector3d[height * lateralCount];
+      int brokenBlockIndex = 0;
 
       for (int dy = 0; dy < height; dy++) {
         for (int lateral = lateralStart; lateral <= lateralEnd; lateral++) {
@@ -363,7 +388,20 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           drops.forEach(storage::addItemStack);
 
           chunk.breakBlock(x, y, z);
+          brokenBlocks[brokenBlockIndex++] = new Vector3d(x, y, z);
         }
+      }
+
+      // I wanted more Ummf~ when breaking more blocks. A greater sound
+      int soundIndex = SoundEvent.getAssetMap().getIndex(BREAK_SOUND_ID);
+      for (Vector3d brokenBlock : brokenBlocks) {
+        if (brokenBlock == null) {
+          continue;
+        }
+        SoundUtil.playSoundEvent3d(soundIndex,
+            SoundCategory.SFX,
+            brokenBlock,
+            context.getWorld().getEntityStore().getStore());
       }
     });
   }
@@ -401,6 +439,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         System.err
             .println(
                 "[AncientConstructLogicSystem] dropInContainer - Either no block in front or it has an invalid ref");
+        component.setStatus(AncientConstructStatus.ERROR);
         return;
       }
 
@@ -421,6 +460,12 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         constructStorage.moveAllItemStacksTo(benchState.getItemContainer());
         benchState.setActive(true);
       }
+
+      int soundIndex = SoundEvent.getAssetMap().getIndex(OPEN_CONTAINER_SOUND_ID);
+      SoundUtil.playSoundEvent3d(soundIndex,
+          SoundCategory.SFX,
+          newPos.toVector3d(),
+          context.getWorld().getEntityStore().getStore());
     });
   }
 
@@ -457,6 +502,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         System.err
             .println(
                 "[AncientConstructLogicSystem] takeBenchOutput - Either no block in front or it has an invalid ref");
+        component.setStatus(AncientConstructStatus.ERROR);
         return;
       }
 
@@ -472,6 +518,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
 
         if (blockTypeBench.getType() != BenchType.Processing) {
           System.err.println("[AncientConstructLogicSystem] takeBenchOutput - Is not a processing bench");
+          component.setStatus(AncientConstructStatus.ERROR);
           return;
         }
 
@@ -481,12 +528,18 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           System.err.println(
               "[AncientConstructLogicSystem] takeBenchOutput - Could not find output slot from output slot map, for id "
                   + benchId);
+          component.setStatus(AncientConstructStatus.ERROR);
           return;
         }
 
         for (short slot : outputSlots) {
           benchState.getItemContainer().moveItemStackFromSlot(slot, constructStorage);
         }
+        int soundIndex = SoundEvent.getAssetMap().getIndex(OPEN_CONTAINER_SOUND_ID);
+        SoundUtil.playSoundEvent3d(soundIndex,
+            SoundCategory.SFX,
+            newPos.toVector3d(),
+            context.getWorld().getEntityStore().getStore());
       }
     });
   }

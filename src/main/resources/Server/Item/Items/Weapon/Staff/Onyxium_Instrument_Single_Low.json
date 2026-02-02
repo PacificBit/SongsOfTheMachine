@@ -51,7 +51,7 @@
             "ItemPlayerAnimationsId": "Skeleton_Spear",
             "ItemAnimationId": "SpinSwingRightHeavy",
             "ClearAnimationOnFinish": true,
-            "LocalSoundEventId": "SFX_Spear_Lunge_Local"
+            "LocalSoundEventId": "SFX_SOTM_Track_1"
           },
           "Next": {
             "Type": "MusicToolChangeAction",
@@ -69,7 +69,7 @@
             "Type": "MusicToolChangeAction"
           },
           "Effects": {
-            "LocalSoundEventId": "SFX_Spear_Lunge_Local",
+            "LocalSoundEventId": "SFX_SOTM_Track_3",
             "ItemPlayerAnimationsId": "Skeleton_Spear",
             "ItemAnimationId": "SpinSwingLeftHeavy",
             "ClearAnimationOnFinish": true,
@@ -100,7 +100,7 @@
             }
           },
           "Effects": {
-            "LocalSoundEventId": "SFX_Avatar_Powers_Enable",
+            "LocalSoundEventId": "SFX_SOTM_Track_2",
             "Particles": [
               {
                 "PositionOffset": {

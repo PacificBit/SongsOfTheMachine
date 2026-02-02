@@ -8,12 +8,20 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.vector.Vector3d;
+import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransaction;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
+import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
@@ -89,6 +97,12 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
       AncientConstructAction next = step(curr, delta);
       comp.setAction(next);
 
+      Store<EntityStore> store = world.getEntityStore().getStore();
+      Vector3d playerPos = store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition();
+      // SoundUtil.playSoundEvent3dToPlayer(playerRef,
+      // SoundEvent.getAssetMap().getIndex(curr.getSoundId()),
+      // SoundCategory.SFX, playerPos, store);
+
       ItemStack updated = current.withMetadata(
           MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC,
@@ -106,6 +120,9 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
       System.err.println("[MusicToolChangeAction] New action: " + next);
 
       this.store.getMusicToolHui(comp.getUUID()).updateCurrentAction(next);
+
+      SoundUtil.playSoundEvent3dToPlayer(playerRef, SoundEvent.getAssetMap().getIndex(next.getSoundId()),
+          SoundCategory.SFX, playerPos, store);
     });
   }
 

@@ -1,0 +1,14 @@
+{
+  "Layers": [
+    {
+      "Files": [
+        "Sounds/Effects/MusicInstrument/Track_6.ogg"
+      ],
+      "Volume": 10
+    }
+  ],
+  "MaxDistance": 40,
+  "StartAttenuationDistance": 5,
+  "AudioCategory": "Sotm_Melodies",
+  "Volume": 10
+}

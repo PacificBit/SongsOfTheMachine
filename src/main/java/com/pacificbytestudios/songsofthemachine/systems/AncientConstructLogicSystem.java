@@ -99,6 +99,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       // SoundCategory.SFX,
       // newPos.toVector3d(),
       // context.getWorld().getEntityStore().getStore());
+      // SFX_Avatar_Powers_Enable
 
     }
 
@@ -243,7 +244,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           AncientConstuctComponent.getComponentType());
       newComponent.copyFrom(oldComponent);
 
-      SoundUtil.playSoundEvent3d(MOVE_FWD_SFX_INDEX,
+      int index = SoundEvent.getAssetMap().getIndex("SFX_SOTM_Construct_Move");
+      SoundUtil.playSoundEvent3d(index,
           SoundCategory.SFX,
           newPos.toVector3d(),
           context.getWorld().getEntityStore().getStore());

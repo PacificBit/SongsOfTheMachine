@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
@@ -22,7 +24,9 @@ import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockBreakingDropType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockGathering;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.StateData;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.bench.Bench;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.bench.ProcessingBench;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
@@ -441,31 +445,32 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         return;
       }
 
-      Ref<ChunkStore> newPosBlockRef = chunk.getBlockComponentEntity(newPos.x, newPos.y, newPos.z);
-      if (newPosBlockRef == null) {
-        System.err
-            .println(
-                "[AncientConstructLogicSystem] dropInContainer - Either no block in front or it has an invalid ref");
-        component.setStatus(AncientConstructStatus.ERROR);
-        return;
-      }
-
       BlockType blockType = chunk.getBlockType(newPos);
-      Bench blockTypeBench = blockType.getBench();
-      BlockState state = context.getWorld().getState(newPos.x, newPos.y, newPos.z, true);
-      if (blockType.getState() instanceof ItemContainerState.ItemContainerStateData) {
-        System.out.println("[AncientConstructLogicSystem] dropInContainer - Found container");
-        ComponentType<ChunkStore, ItemContainerState> containerComponentType = BlockStateModule.get()
-            .getComponentType(ItemContainerState.class);
-        ItemContainerState container = newPosBlockRef.getStore().getComponent(newPosBlockRef, containerComponentType);
-        constructStorage.moveAllItemStacksTo(container.getItemContainer());
-      } else if ((state instanceof ProcessingBenchState benchState) &&
-          blockTypeBench != null &&
-          blockTypeBench.equals(benchState.getBench()) &&
-          benchState.initialize(blockType)) {
-        System.out.println("[AncientConstructLogicSystem] dropInContainer - Found working bench");
+      Bench benchBlock = blockType.getBench();
+
+      if (benchBlock == null) {
+        AssetExtraInfo.Data blockData = blockType.getData();
+
+        ItemContainerState containerState = (ItemContainerState) context.getWorld().getState(
+            newPos.x, newPos.y, newPos.z, true);
+
+        if (blockData == null || blockData.getContainerData() == null || containerState == null) {
+          System.out.println("[AncientConstructLogicSystem] dropInContainer - No valid container found");
+          component.setStatus(AncientConstructStatus.ERROR);
+          return;
+        }
+        constructStorage.moveAllItemStacksTo(containerState.getItemContainer());
+
+      } else if (benchBlock.getType().equals(BenchType.Processing)) {
+        ProcessingBenchState benchState = (ProcessingBenchState) context.getWorld().getState(
+            newPos.x, newPos.y, newPos.z, true);
         constructStorage.moveAllItemStacksTo(benchState.getItemContainer());
         benchState.setActive(true);
+
+      } else {
+        System.out.println("[AncientConstructLogicSystem] dropInContainer - Bench type not supported");
+        component.setStatus(AncientConstructStatus.ERROR);
+        return;
       }
 
       int soundIndex = SoundEvent.getAssetMap().getIndex(OPEN_CONTAINER_SOUND_ID);
@@ -474,6 +479,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           newPos.toVector3d(),
           context.getWorld().getEntityStore().getStore());
     });
+
   }
 
   private void takeBenchOutput(

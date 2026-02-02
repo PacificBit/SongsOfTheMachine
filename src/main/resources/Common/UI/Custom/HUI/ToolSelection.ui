@@ -95,7 +95,8 @@ Group #DebugRoot {
 
 
 Group #ActionBuffer {
-  Anchor: (Left: 1450, Top: 880, Width: 100, Height: 40);
+  Anchor: (Left: 970, Top: 840, Width: 120, Height: 40);
+  Background: (TexturePath: "../Common/PopupItem.png", Border: 20);
   LayoutMode: Left;
 
   Group #ActionSlot1 {

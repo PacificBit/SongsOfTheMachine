@@ -74,13 +74,15 @@ public class MusicToolUseInteraction extends SimpleInteraction {
       InteractionType type,
       InteractionContext context,
       CooldownHandler cooldownHandler) {
-    System.out.println("[MusicToolInteraction] Music tool action: " + action.getId());
+    System.out.println(
+        "[MusicToolInteraction] Music tool action: " + action.getId());
     Ref<EntityStore> playerRef = context.getEntity();
     World world = playerRef.getStore().getExternalData().getWorld();
 
     world.execute(() -> {
       ItemStack held = context.getHeldItem();
-      MusicToolComponent musicTool = held.getFromMetadataOrDefault(MusicToolComponent.METADATA_KEY,
+      MusicToolComponent musicTool = held.getFromMetadataOrDefault(
+          MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC);
 
       if (musicTool != null && musicTool.getAction() != null) {
@@ -122,8 +124,10 @@ public class MusicToolUseInteraction extends SimpleInteraction {
 
       for (long chunkIndex : chunkIndices) {
         WorldChunk chunk = world.getChunk(chunkIndex);
-        if (chunk == null)
+        if (chunk == null) {
+          System.err.println("[MusicToolInteraction] Could not fetch chunk");
           continue;
+        }
 
         Set<Ref<ChunkStore>> ancientConstructs = this.constructStore.getAncientConstructInChunk(chunk.getReference());
         if (ancientConstructs == null || ancientConstructs.isEmpty()) {
@@ -134,8 +138,11 @@ public class MusicToolUseInteraction extends SimpleInteraction {
           BlockModule.BlockStateInfo info = construct.getStore().getComponent(
               construct,
               BlockModule.BlockStateInfo.getComponentType());
-          if (info == null)
+          if (info == null) {
+            System.err.println("[MusicToolInteraction] No block info found for construct: (world=" + world.getName()
+                + ", chunk=(" + chunk.getX() + ", " + chunk.getZ() + "))");
             continue;
+          }
 
           Vector3i constructPos = Utils.getBlockPosition(chunk, info.getIndex());
 
@@ -160,12 +167,13 @@ public class MusicToolUseInteraction extends SimpleInteraction {
             ancientConstruct.clearActionBuffer();
           }
 
-          ancientConstruct.setStatus(AncientConstructStatus.LISTENING);
-          ancientConstruct.setActionLoop(this.isLoopingInstrument);
           if (ancientConstruct.getActionCapacity() != this.actionCapacity) {
             ancientConstruct.clearActionBuffer();
             ancientConstruct.setActionCapacity(this.actionCapacity);
           }
+
+          ancientConstruct.setStatus(AncientConstructStatus.LISTENING);
+          ancientConstruct.setActionLoop(this.isLoopingInstrument);
 
           if (ancientConstruct.addAction(action, musicTool.getUUID())) {
             System.out.println("[MusicToolInteraction] Action added successfully");

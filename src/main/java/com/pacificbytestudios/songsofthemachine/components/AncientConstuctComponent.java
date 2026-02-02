@@ -34,6 +34,7 @@ public class AncientConstuctComponent extends ItemContainerState {
           (obj, value) -> obj.storage = value,
           (obj) -> obj.getItemContainer())
       .add()
+
       .build();
 
   private AncientConstructStatus status;
@@ -54,16 +55,20 @@ public class AncientConstuctComponent extends ItemContainerState {
   }
 
   public boolean addAction(AncientConstructAction action, UUID listeningTo) {
-    if (this.listeningToPlayerInstrumentId != listeningTo) {
+    if (this.listeningToPlayerInstrumentId == null ||
+        !this.listeningToPlayerInstrumentId.equals(listeningTo)) {
       this.resetTime();
       this.listeningToPlayerInstrumentId = listeningTo;
     }
 
-    if (this.actionCount > this.actionCapacity) {
+    if (this.actionCount > this.actionCapacity)
+
+    {
       this.status = AncientConstructStatus.ERROR;
       return false;
     }
-    int id = action.getId() & 0xFF;
+    int id = action.getId()
+        & 0xFF;
     this.actionBuffer |= (id << (this.actionCount * BIT_ACTION_SIZE));
     this.bkActionBuffer = actionBuffer;
     this.actionCount += 1;
@@ -182,6 +187,7 @@ public class AncientConstuctComponent extends ItemContainerState {
         this.actionBuffer = this.bkActionBuffer;
         return;
       }
+      System.out.println("[AncientConstuctComponent] clearNextAction - Completed all the scheduled actions");
       this.status = AncientConstructStatus.COMPLETED;
     }
   }

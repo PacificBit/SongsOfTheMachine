@@ -147,7 +147,9 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         System.out
             .println(
                 "[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getRemainingActions()));
-        System.out.println(construct.getStatus());
+        System.out
+            .println(
+                "[AncientConstructLogicSystem] Exiting with State: " + construct.getStatus());
       }
       return;
     } else if (construct.getStatus() == AncientConstructStatus.COMPLETED) {

@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.customcodec.ActionSelection;
@@ -27,10 +28,10 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 import com.pacificbytestudios.songsofthemachine.enums.MusicToolQuality;
 import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
+import com.pacificbytestudios.songsofthemachine.storage.MusicToolHUIStorage;
 import com.pacificbytestudios.songsofthemachine.utils.Utils;
 
 public class MusicToolUseInteraction extends SimpleInteraction {
-  private static final byte MAX_CAPACITY = 4;
   public static final BuilderCodec<MusicToolUseInteraction> CODEC = BuilderCodec
       .builder(MusicToolUseInteraction.class, MusicToolUseInteraction::new, SimpleInteraction.CODEC)
       .append(
@@ -45,7 +46,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
       .add()
       .append(
           new KeyedCodec<>("ActionsCapacity", Codec.BYTE),
-          (obj, value) -> obj.actionCapacity = (byte) Math.min(value, MAX_CAPACITY),
+          (obj, value) -> obj.actionCapacity = (byte) Math.min(value, MusicToolComponent.MAX_CAPACITY),
           obj -> obj.actionCapacity == null ? 1 : obj.actionCapacity)
       .add()
       .append(new KeyedCodec<>("IsLoopingInstrument", Codec.BOOLEAN),
@@ -58,10 +59,12 @@ public class MusicToolUseInteraction extends SimpleInteraction {
   private byte quality;
   private Byte actionCapacity;
   private boolean isLoopingInstrument;
-  private AncientConstructStore store;
+  private AncientConstructStore constructStore;
+  private MusicToolHUIStorage huiStorage;
 
   public MusicToolUseInteraction() {
-    this.store = AncientConstructStore.get();
+    this.constructStore = AncientConstructStore.get();
+    this.huiStorage = MusicToolHUIStorage.get();
   }
 
   @Override
@@ -77,11 +80,11 @@ public class MusicToolUseInteraction extends SimpleInteraction {
 
     world.execute(() -> {
       ItemStack held = context.getHeldItem();
-      MusicToolComponent comp = held.getFromMetadataOrDefault(MusicToolComponent.METADATA_KEY,
+      MusicToolComponent musicTool = held.getFromMetadataOrDefault(MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC);
 
-      if (comp != null && comp.getAction() != null) {
-        this.action = comp.getAction();
+      if (musicTool != null && musicTool.getAction() != null) {
+        this.action = musicTool.getAction();
       } else {
         System.err.println("[MusicToolUseInteraction] Could not fetch action");
         this.action = AncientConstructAction.IDLE;
@@ -122,7 +125,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
         if (chunk == null)
           continue;
 
-        Set<Ref<ChunkStore>> ancientConstructs = this.store.getAncientConstructInChunk(chunk.getReference());
+        Set<Ref<ChunkStore>> ancientConstructs = this.constructStore.getAncientConstructInChunk(chunk.getReference());
         if (ancientConstructs == null || ancientConstructs.isEmpty()) {
           continue;
         }
@@ -143,25 +146,29 @@ public class MusicToolUseInteraction extends SimpleInteraction {
 
           System.out.println("[MusicToolInteraction] Found AncientConstruct at: " + constructPos);
 
-          AncientConstuctComponent component = construct.getStore().getComponent(construct,
+          AncientConstuctComponent ancientConstruct = construct.getStore().getComponent(construct,
               AncientConstuctComponent.getComponentType());
 
-          if (component == null || !component.canBeInterrupted()) {
+          if (ancientConstruct == null || !ancientConstruct.canBeInterrupted()) {
             System.out.println("[MusicToolInteraction] Cannot interact with component");
-            System.out.println("Status " + component.getStatus() + " is looping " + component.getIsLooping());
+            System.out
+                .println("Status " + ancientConstruct.getStatus() + " is looping " + ancientConstruct.getIsLooping());
             continue;
           }
 
-          component.setStatus(AncientConstructStatus.LISTENING);
-          component.setActionLoop(this.isLoopingInstrument);
-          if (component.getActionCapacity() != this.actionCapacity) {
-            component.clearActionBuffer();
-            component.setActionCapacity(this.actionCapacity);
+          ancientConstruct.setStatus(AncientConstructStatus.LISTENING);
+          ancientConstruct.setActionLoop(this.isLoopingInstrument);
+          if (ancientConstruct.getActionCapacity() != this.actionCapacity) {
+            ancientConstruct.clearActionBuffer();
+            ancientConstruct.setActionCapacity(this.actionCapacity);
           }
 
-          if (component.addAction(action)) {
+          if (ancientConstruct.addAction(action, musicTool.getUUID())) {
             System.out.println("[MusicToolInteraction] Action added successfully");
-            this.store.addAncient(construct);
+            this.constructStore.addAncient(construct);
+            this.huiStorage.getMusicToolHui(musicTool.getUUID()).updateActionCount(
+                ancientConstruct.getBufferLoad(),
+                ancientConstruct.getActionCapacity());
           } else {
             System.err.println("[MusicToolInteraction] Could not add action");
           }

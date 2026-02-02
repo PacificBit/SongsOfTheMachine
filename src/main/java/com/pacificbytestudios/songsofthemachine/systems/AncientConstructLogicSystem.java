@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -33,10 +34,13 @@ import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
 import com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule;
 import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
+import com.pacificbytestudios.songsofthemachine.hui.ToolSelectionHUI;
 import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
+import com.pacificbytestudios.songsofthemachine.storage.MusicToolHUIStorage;
 import com.pacificbytestudios.songsofthemachine.utils.Utils;
 
 public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore> {
@@ -55,7 +59,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   private static final int DIRECTION_FORWARD = 1;
 
   private static Map<String, short[]> OUTPUT_SLOTS = new HashMap<>();
-  private AncientConstructStore store;
+  private AncientConstructStore ancientConstructStore;
+  private MusicToolHUIStorage huiStorage;
 
   static {
     OUTPUT_SLOTS.put(FURNACE_ID + "1", new short[] { 3, 4, 5, 6 });
@@ -65,7 +70,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   }
 
   public AncientConstructLogicSystem() {
-    store = AncientConstructStore.get();
+    ancientConstructStore = AncientConstructStore.get();
+    huiStorage = MusicToolHUIStorage.get();
   }
 
   @Override
@@ -82,7 +88,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       return;
     }
 
-    if (!this.store.hasPendingCommands(entityRef)) {
+    if (!this.ancientConstructStore.hasPendingCommands(entityRef)) {
       return;
     }
 
@@ -99,7 +105,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     if (construct.getStatus() == AncientConstructStatus.ERROR) {
       construct.clearActionBuffer();
       construct.setStatus(AncientConstructStatus.LISTENING);
-      this.store.removeAncient(entityRef);
+      this.ancientConstructStore.removeAncient(entityRef);
 
       BlockModule.BlockStateInfo info = chunkStore.getComponent(entityRef,
           BlockModule.BlockStateInfo.getComponentType());
@@ -118,6 +124,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     if (construct.getStatus() == AncientConstructStatus.READY_TO_EXECUTE) {
       construct.setStatus(AncientConstructStatus.EXECUTING);
       construct.resetTime();
+      clearInstrumentHUI(construct.getListeningInstrumentId(), construct.getActionCapacity());
       System.out.println("=======================================================");
       System.out.println(
           "[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getRemainingActions()));
@@ -146,17 +153,15 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     } else if (construct.getStatus() == AncientConstructStatus.COMPLETED) {
       System.out.println("[AncientConstructLogicSystem] Completed instruction set");
       construct.clearActionBuffer();
-      this.store.removeAncient(entityRef);
+      this.ancientConstructStore.removeAncient(entityRef);
       return;
     }
 
-    System.out
-        .println("[AncientConstructLogicSystem] Entity " + entityRef.getIndex() + ", clock: " + construct.getTime());
-
     if (construct.resetClockIfTimeout()) {
-      this.store.removeAncient(entityRef);
+      this.ancientConstructStore.removeAncient(entityRef);
       construct.clearActionBuffer();
       System.out.println("[AncientConstructLogicSystem] Entity command timeout");
+      clearInstrumentHUI(construct.getListeningInstrumentId(), construct.getActionCapacity());
     }
   }
 
@@ -262,12 +267,12 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           newPos.toVector3d(),
           context.getWorld().getEntityStore().getStore());
 
-      this.store.removeAncient(entityRef);
-      this.store.addAncient(newEntityRef);
+      this.ancientConstructStore.removeAncient(entityRef);
+      this.ancientConstructStore.addAncient(newEntityRef);
       if (chunk.getIndex() != context.getChunk().getIndex()) {
         System.out.println("[AncientConstructLogicSystem] Moving into new chunk");
-        this.store.removeAncientConstructFromChunkId(context.getChunk().getReference(), entityRef);
-        this.store.setAncientConstructChunkId(chunk.getReference(), newEntityRef);
+        this.ancientConstructStore.removeAncientConstructFromChunkId(context.getChunk().getReference(), entityRef);
+        this.ancientConstructStore.setAncientConstructChunkId(chunk.getReference(), newEntityRef);
       }
     });
   }
@@ -314,8 +319,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           blockPos.toVector3d(),
           context.getWorld().getEntityStore().getStore());
 
-      this.store.removeAncient(entityRef);
-      this.store.addAncient(newEntityRef);
+      this.ancientConstructStore.removeAncient(entityRef);
+      this.ancientConstructStore.addAncient(newEntityRef);
     });
   }
 
@@ -542,6 +547,15 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
             context.getWorld().getEntityStore().getStore());
       }
     });
+  }
+
+  private void clearInstrumentHUI(UUID musicToolId, int capacity) {
+    ToolSelectionHUI hui = this.huiStorage.getMusicToolHui(musicToolId);
+    if (hui == null) {
+      System.err.println("No linked HUI to that instrument");
+      return;
+    }
+    hui.updateActionCount(0, capacity);
   }
 
   @Override

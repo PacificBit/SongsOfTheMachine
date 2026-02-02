@@ -14,6 +14,7 @@ import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.hui.EmptyHUI;
@@ -71,6 +72,17 @@ public class PlayerHotbarWatcher implements PlayerPacketWatcher {
           MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC);
 
+      if (musicTool.getCapacity() < 0) {
+        String targetItemId = targetItem.getItemId();
+        int capacity = 1;
+        if (targetItemId.contains("Avg")) {
+          capacity = 2;
+        } else if (targetItemId.contains("Great")) {
+          capacity = 4;
+        }
+        musicTool.setCapacity((byte) capacity);
+      }
+
       if (musicTool.getUUID() == null) {
         UUID newUUID = UUID.randomUUID();
         musicTool.setUUID(newUUID);
@@ -106,6 +118,7 @@ public class PlayerHotbarWatcher implements PlayerPacketWatcher {
       player.getHudManager().setCustomHud(playerRef, hui);
       AncientConstructAction action = musicTool.getAction();
       hui.updateCurrentAction(action == null ? AncientConstructAction.IDLE : action);
+      hui.updateActionCount(0, musicTool.getCapacity());
     });
   }
 

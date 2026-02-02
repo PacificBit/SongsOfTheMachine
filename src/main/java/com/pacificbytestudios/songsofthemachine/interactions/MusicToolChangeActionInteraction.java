@@ -97,9 +97,6 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
 
       Store<EntityStore> store = world.getEntityStore().getStore();
       Vector3d playerPos = store.getComponent(playerRef, TransformComponent.getComponentType()).getPosition();
-      // SoundUtil.playSoundEvent3dToPlayer(playerRef,
-      // SoundEvent.getAssetMap().getIndex(curr.getSoundId()),
-      // SoundCategory.SFX, playerPos, store);
 
       ItemStack updated = current.withMetadata(
           MusicToolComponent.METADATA_KEY,

@@ -1,5 +1,8 @@
 @Container = (TexturePath: "../Common/DropdownBox.png", Border: 20);
 @Empty = #000000(0.0);
+@Active = (TexturePath: "../Common/ScrollbarHandleHovered.png", Border: 3);
+@NotActive = (TexturePath: "../Common/ScrollbarHandleDragged.png", Border: 3);
+
 
 
 Group #DebugRoot {
@@ -87,5 +90,31 @@ Group #DebugRoot {
       Text: "Collect";
       Padding: (Full: 12);
     }
+  }
+}
+
+Group #ActionBuffer {
+  Anchor: (Left: 1200, Top: 800, Width: 100, Height: 40);
+  LayoutMode: Left;
+
+  Group #Action1 {
+    Background: @NotActive;
+    Anchor: (Width: 10, Height: 10);
+    Padding: (Full: 1);
+  }
+  Group #Action2 {
+    Background: @NotActive;
+    Anchor: (Width: 10, Height: 10);
+    Padding: (Full: 1);
+  }
+  Group #Action3 {
+    Background: @NotActive;
+    Anchor: (Width: 10, Height: 10);
+    Padding: (Full: 1);
+  }
+  Group #Action4 {
+    Background: @NotActive;
+    Anchor: (Width: 10, Height: 10);
+    Padding: (Full: 1);
   }
 }

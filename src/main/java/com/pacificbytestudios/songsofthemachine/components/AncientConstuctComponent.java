@@ -1,5 +1,7 @@
 package com.pacificbytestudios.songsofthemachine.components;
 
+import java.util.UUID;
+
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -44,13 +46,19 @@ public class AncientConstuctComponent extends ItemContainerState {
   private float timeout;
   private byte actionCapacity;
   private ItemContainer storage;
+  private UUID listeningToPlayerInstrumentId;
 
   public AncientConstuctComponent() {
     this.clock = 0f;
     this.status = AncientConstructStatus.LISTENING;
   }
 
-  public boolean addAction(AncientConstructAction action) {
+  public boolean addAction(AncientConstructAction action, UUID listeningTo) {
+    if (this.listeningToPlayerInstrumentId != listeningTo) {
+      this.resetTime();
+      this.listeningToPlayerInstrumentId = listeningTo;
+    }
+
     if (this.actionCount > this.actionCapacity) {
       this.status = AncientConstructStatus.ERROR;
       return false;
@@ -121,6 +129,10 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.status = status;
   }
 
+  public int getBufferLoad() {
+    return Byte.toUnsignedInt(this.actionCount);
+  }
+
   public void setActionCapacity(byte actionCapacity) {
     this.status = AncientConstructStatus.LISTENING;
     this.actionCapacity = actionCapacity;
@@ -130,6 +142,10 @@ public class AncientConstuctComponent extends ItemContainerState {
     return this.status == AncientConstructStatus.LISTENING ||
         this.status == AncientConstructStatus.IDLE ||
         this.loopActions;
+  }
+
+  public UUID getListeningInstrumentId() {
+    return this.listeningToPlayerInstrumentId;
   }
 
   public AncientConstructAction[] getRemainingActions() {

@@ -13,6 +13,7 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 
 public class MusicToolComponent implements Component<ChunkStore> {
   public static final String METADATA_KEY = "SongsOfTheMachine.MusicToolComponent";
+  public static final byte MAX_CAPACITY = 4;
 
   public static final BuilderCodec<MusicToolComponent> CODEC = BuilderCodec
       .builder(MusicToolComponent.class, MusicToolComponent::new)
@@ -26,6 +27,11 @@ public class MusicToolComponent implements Component<ChunkStore> {
           (obj) -> obj.uuid)
       .add()
 
+      .append(new KeyedCodec<>("Capacity", Codec.BYTE),
+          (obj, value) -> obj.capacity = value,
+          (obj) -> obj.capacity)
+      .add()
+
       .build();
 
   public static ComponentType<ChunkStore, MusicToolComponent> getComponentType() {
@@ -34,6 +40,7 @@ public class MusicToolComponent implements Component<ChunkStore> {
 
   private AncientConstructAction action;
   private UUID uuid;
+  private byte capacity = -1;
 
   public AncientConstructAction getAction() {
     return this.action;
@@ -51,11 +58,20 @@ public class MusicToolComponent implements Component<ChunkStore> {
     this.uuid = uuid;
   }
 
+  public void setCapacity(byte capacity) {
+    this.capacity = capacity;
+  }
+
+  public byte getCapacity() {
+    return this.capacity;
+  }
+
   @Override
   public MusicToolComponent clone() {
     MusicToolComponent component = new MusicToolComponent();
     component.action = this.action;
     component.uuid = this.uuid;
+    component.capacity = this.capacity;
     return component;
   }
 

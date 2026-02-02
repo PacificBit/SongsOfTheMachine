@@ -8,21 +8,23 @@
   ],
   "Quality": "Common",
   "ItemLevel": 40,
+  "Model": "Items/Weapons/Staff/Onyxium.blockymodel",
+  "Texture": "Items/Weapons/Staff/Onyxium_Texture.png",
   "PlayerAnimationsId": "Staff",
   "IconProperties": {
     "Scale": 0.28,
+    "Translation": [
+      -53,
+      -52
+    ],
     "Rotation": [
       45,
       90,
       0
-    ],
-    "Translation": [
-      -53,
-      -52
     ]
   },
   "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
-  "Icon": "Icons/ItemsGenerated/Onyxium_Instrument_Loop_Low.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Staff_Onyxium.png",
   "Tags": {
     "Type": [
       "Weapon"
@@ -43,9 +45,7 @@
                 "SystemId": "E_Sphere_Old",
                 "PositionOffset": {
                   "Z": 2.8
-                },
-                "TargetEntityPart": "Entity",
-                "Color": "#ffffff"
+                }
               }
             ],
             "ItemPlayerAnimationsId": "Skeleton_Spear",
@@ -78,8 +78,7 @@
                 "SystemId": "E_Sphere_Old",
                 "PositionOffset": {
                   "Z": 2.8
-                },
-                "TargetEntityPart": "Entity"
+                }
               }
             ]
           },
@@ -95,11 +94,10 @@
           "Next": {
             "Type": "MusicToolUseInteraction",
             "Quality": 1,
-            "ActionsCapacity": 1,
+            "ActionsCapacity": 4,
             "Action": {
               "Move Forward": true
-            },
-            "IsLoopingInstrument": true
+            }
           },
           "Effects": {
             "LocalSoundEventId": "SFX_SOTM_Track_2",
@@ -131,15 +129,5 @@
     }
   },
   "MaxStack": 1,
-  "Scale": 1,
-  "BlockType": {
-    "CustomModel": "Items/Weapons/Staff/Onyxium.blockymodel",
-    "CustomModelTexture": [
-      {
-        "Texture": "Blocks/Textures/Onyxium_Texture_White.png",
-        "Weight": 1
-      }
-    ],
-    "DrawType": "Model"
-  }
+  "Scale": 1
 }

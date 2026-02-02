@@ -1,0 +1,91 @@
+@Container = (TexturePath: "../Common/DropdownBox.png", Border: 20);
+@Empty = #000000(0.0);
+
+
+Group #DebugRoot {
+  Anchor: (Left: 625, Top: 880, Width: 820, Height: 40);
+  Background: (TexturePath: "../Common/PopupItem.png", Border: 20);
+  LayoutMode: Left;
+
+  Group #Idle {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+
+    Label {
+      Text: "Idle";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #MoveForward {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Move Forward";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #MoveBack {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Move Back";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #TurnLeft {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Turn Left";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #TurnRight {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Turn Right";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #BasicBreakBlock {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Chisel";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #ComplexBreakBlock {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Excavate";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #DropInContainer {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Deposit";
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #TakeOutputBench {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Collect";
+      Padding: (Full: 12);
+    }
+  }
+}

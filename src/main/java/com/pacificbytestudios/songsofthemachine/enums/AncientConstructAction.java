@@ -16,6 +16,7 @@ public enum AncientConstructAction {
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();
+  private static final Map<AncientConstructAction, String> ACTION_TO_UI_ID_MAP = new HashMap<>();
 
   static {
     for (AncientConstructAction action : values()) {
@@ -34,6 +35,29 @@ public enum AncientConstructAction {
   private final byte id;
   private final String name;
   private final float executionTime; // in secs
+
+  static {
+    for (AncientConstructAction action : values()) {
+      BY_ID.put(action.id, action);
+    }
+
+    ACTION_TO_EXCAVATION_SIZE_MAP.put(BASIC_BREAK_BLOCK, new int[] { 1, 2 });
+    ACTION_TO_EXCAVATION_SIZE_MAP.put(COMPLEX_BREAK_BLOCK, new int[] { 3, 3 });
+
+    ACTION_TO_UI_ID_MAP.put(IDLE, "Idle");
+    ACTION_TO_UI_ID_MAP.put(MOVE_FORWARD, "MoveForward");
+    ACTION_TO_UI_ID_MAP.put(MOVE_BACK, "MoveBack");
+    ACTION_TO_UI_ID_MAP.put(TURN_LEFT, "TurnLeft");
+    ACTION_TO_UI_ID_MAP.put(TURN_RIGHT, "TurnRight");
+    ACTION_TO_UI_ID_MAP.put(BASIC_BREAK_BLOCK, "BasicBreakBlock");
+    ACTION_TO_UI_ID_MAP.put(COMPLEX_BREAK_BLOCK, "ComplexBreakBlock");
+    ACTION_TO_UI_ID_MAP.put(DROP_IN_CONTAINER, "DropInContainer");
+    ACTION_TO_UI_ID_MAP.put(TAKE_OUTPUT_BENCH, "TakeOutputBench");
+  }
+
+  public static String getUiIdFor(AncientConstructAction action) {
+    return ACTION_TO_UI_ID_MAP.get(action);
+  }
 
   AncientConstructAction(byte id, String name, float executionTime) {
     this.id = id;

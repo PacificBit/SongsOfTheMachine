@@ -54,7 +54,8 @@
             "LocalSoundEventId": "SFX_Spear_Lunge_Local"
           },
           "Next": {
-            "Type": "MusicToolChangeAction"
+            "Type": "MusicToolChangeAction",
+            "ChangesToPrevious": true
           },
           "RunTime": 0.4
         }
@@ -65,8 +66,7 @@
         {
           "Type": "Simple",
           "Next": {
-            "Type": "MusicToolChangeAction",
-            "ChangesToPrevious": true
+            "Type": "MusicToolChangeAction"
           },
           "Effects": {
             "LocalSoundEventId": "SFX_Spear_Lunge_Local",
@@ -94,10 +94,11 @@
           "Next": {
             "Type": "MusicToolUseInteraction",
             "Quality": 1,
-            "ActionsCapacity": 1,
+            "ActionsCapacity": 4,
             "Action": {
               "Move Forward": true
-            }
+            },
+            "IsLoopingInstrument": true
           },
           "Effects": {
             "LocalSoundEventId": "SFX_Avatar_Powers_Enable",

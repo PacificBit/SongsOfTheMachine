@@ -9,7 +9,6 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransaction;
@@ -20,9 +19,9 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
+import com.pacificbytestudios.songsofthemachine.storage.MusicToolHUIStorage;
 
 public class MusicToolChangeActionInteraction extends SimpleInteraction {
-
   public static final BuilderCodec<MusicToolChangeActionInteraction> CODEC = BuilderCodec
       .builder(MusicToolChangeActionInteraction.class, MusicToolChangeActionInteraction::new, SimpleInteraction.CODEC)
       .append(new KeyedCodec<>("ChangesToPrevious", Codec.BOOLEAN),
@@ -31,8 +30,9 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
       .add()
       .build();
 
-  private boolean changesToPrev;
   private static int actionCount;
+  private boolean changesToPrev;
+  private MusicToolHUIStorage store;
 
   private static final Map<AncientConstructAction, Integer> ACTION_INDEX = buildIndex(AncientConstructAction.values());
 
@@ -60,6 +60,7 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
   }
 
   public MusicToolChangeActionInteraction() {
+    this.store = MusicToolHUIStorage.get();
   }
 
   @Override
@@ -88,8 +89,6 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
       AncientConstructAction next = step(curr, delta);
       comp.setAction(next);
 
-      world.sendMessage(Message.raw("Tool changed to: " + next.getName()));
-
       ItemStack updated = current.withMetadata(
           MusicToolComponent.METADATA_KEY,
           MusicToolComponent.CODEC,
@@ -105,6 +104,8 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
 
       context.setHeldItem(updated);
       System.err.println("[MusicToolChangeAction] New action: " + next);
+
+      this.store.getMusicToolHui(comp.getUUID()).updateCurrentAction(next);
     });
   }
 

@@ -1,0 +1,128 @@
+{
+  "TranslationProperties": {
+    "Name": "server.construct.low.name",
+    "Description": "server.construct.description"
+  },
+  "PlayerAnimationsId": "Block",
+  "Categories": [
+    "Items.Tools"
+  ],
+  "Set": "Furniture_Temple_Dark",
+  "Icon": "Icons/ItemsGenerated/Furniture_Temple_Dark_Statue.png",
+  "IconProperties": {
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Scale": 0.42,
+    "Translation": [
+      0,
+      -25.7
+    ]
+  },
+  "BlockType": {
+    "BlockParticleSetId": "Crystal",
+    "BlockSoundSetId": "Stone",
+    "CustomModel": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/Decorative_Sets/Temple_Dark/Statue_Owl_Texture.png",
+        "Weight": 1
+      }
+    ],
+    "DrawType": "Model",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Rocks"
+      }
+    },
+    "HitboxType": "Statue_Small",
+    "Material": "Solid",
+    "Opacity": "Transparent",
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "VariantRotation": "NESW",
+    "BlockEntity": {
+      "Components": {
+        "AncientConstuctComponent": {
+          "Command Timeout": 40,
+          "Storage": {
+            "Capacity": 18
+          },
+          "CooldownMultiplier": 4
+        }
+      }
+    },
+    "PlacementSettings": {
+      "BlockPreviewVisibility": "AlwaysVisible"
+    },
+    "Interactions": {
+      "Use": "Open_Container",
+      "Primary": "Break_Container"
+    },
+    "ParticleColor": "#121b1e",
+    "Particles": [
+      {
+        "SystemId": "Ice_Blast",
+        "PositionOffset": {
+          "Z": 0,
+          "Y": 2
+        },
+        "Scale": 2,
+        "RotationOffset": {
+          "Yaw": 0,
+          "Roll": 0,
+          "Pitch": 90
+        },
+        "Color": "#9AC77E"
+      }
+    ],
+    "Tint": [
+      "#ffffff"
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Furniture"
+    ],
+    "Family": [
+      "Temple"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Wood",
+  "MaxStack": 1,
+  "Recipe": {
+    "BenchRequirement": [
+      {
+        "Categories": [
+          "Arcane_Misc"
+        ],
+        "Id": "Arcanebench"
+      }
+    ],
+    "Input": [
+      {
+        "ItemId": "Ingredient_Bar_Cobalt",
+        "Quantity": 25
+      },
+      {
+        "ItemId": "Rock_Gem_Emerald",
+        "Quantity": 2
+      },
+      {
+        "ItemId": "Potion_Mana_Large",
+        "Quantity": 4
+      }
+    ],
+    "TimeSeconds": 12
+  }
+}

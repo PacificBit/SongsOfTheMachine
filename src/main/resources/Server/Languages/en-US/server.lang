@@ -1,4 +1,6 @@
-construct.name=Ancient Construct
+construct.low.name=Lower Ancient Construct
+
+construct.great.name=Greater Ancient Construct
 construct.description=Does not obey commands — it listens, remembers, and turns sound into motion.
 
 music_instrument.loop.low.name=Curse of Note

@@ -3,7 +3,7 @@ plugins {
 }
 
 base {
-    archivesName.set("Songsofthemachine")
+    archivesName.set("SongsOfTheMachine")
 }
 
 repositories {

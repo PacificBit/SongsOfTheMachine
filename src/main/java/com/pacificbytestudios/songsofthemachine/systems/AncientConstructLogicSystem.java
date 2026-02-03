@@ -194,6 +194,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case MOVE_FORWARD -> move(context, entityRef, blockPos, DIRECTION_FORWARD);
       case MOVE_BACK -> move(context, entityRef, blockPos, DIRECTION_BACK);
       case TURN_LEFT -> turn(context, entityRef, blockPos, action);
+      case TURN_BACK -> turn(context, entityRef, blockPos, action);
       case TURN_RIGHT -> turn(context, entityRef, blockPos, action);
       case BASIC_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case COMPLEX_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
@@ -301,7 +302,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     context.getWorld().execute(() -> {
       int rotation = context.getChunk().getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
 
-      rotation += (action == AncientConstructAction.TURN_LEFT) ? 1 : -1;
+      int modifier = (action == AncientConstructAction.TURN_LEFT) ? 1 : -1;
+      rotation += (action == AncientConstructAction.TURN_BACK) ? modifier * 2 : modifier;
       rotation = (rotation + 4) % 4;
       String soundId = (action == AncientConstructAction.TURN_LEFT) ? TURN_LEFT_SOUND_ID : TURN_RIGHT_SOUND_ID;
 

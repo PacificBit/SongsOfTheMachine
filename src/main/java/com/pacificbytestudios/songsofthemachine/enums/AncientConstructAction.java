@@ -8,11 +8,12 @@ public enum AncientConstructAction {
   MOVE_FORWARD((byte) 1, "Advance", 0.25f, 0.20f, "SFX_SOTM_Track_3"),
   MOVE_BACK((byte) 2, "Retreat", 0.25f, 0.20f, "SFX_SOTM_Track_5"),
   TURN_LEFT((byte) 3, "Turn Left", 0.25f, 0.20f, "SFX_SOTM_Track_3"),
-  TURN_RIGHT((byte) 4, "Turn Right", 0.25f, 0.20f, "SFX_SOTM_Track_4"),
-  BASIC_BREAK_BLOCK((byte) 5, "Chisel", 0.25f, 0.45f, "SFX_SOTM_Track_5"),
-  COMPLEX_BREAK_BLOCK((byte) 6, "Excavate", 0.25f, 0.50f, "SFX_SOTM_Track_6"),
-  DROP_IN_CONTAINER((byte) 7, "Deposit", 0.25f, 0.30f, "SFX_SOTM_Track_7"),
-  TAKE_OUTPUT_BENCH((byte) 8, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6");
+  TURN_BACK((byte) 4, "Turn Back", 0.25f, 0.20f, "SFX_SOTM_Track_6"),
+  TURN_RIGHT((byte) 5, "Turn Right", 0.25f, 0.20f, "SFX_SOTM_Track_4"),
+  BASIC_BREAK_BLOCK((byte) 6, "Chisel", 0.25f, 0.45f, "SFX_SOTM_Track_5"),
+  COMPLEX_BREAK_BLOCK((byte) 7, "Excavate", 0.25f, 0.50f, "SFX_SOTM_Track_6"),
+  DROP_IN_CONTAINER((byte) 8, "Deposit", 0.25f, 0.30f, "SFX_SOTM_Track_7"),
+  TAKE_OUTPUT_BENCH((byte) 9, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6");
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();
@@ -50,6 +51,7 @@ public enum AncientConstructAction {
     ACTION_TO_UI_ID_MAP.put(MOVE_FORWARD, "MoveForward");
     ACTION_TO_UI_ID_MAP.put(MOVE_BACK, "MoveBack");
     ACTION_TO_UI_ID_MAP.put(TURN_LEFT, "TurnLeft");
+    ACTION_TO_UI_ID_MAP.put(TURN_BACK, "TurnBack");
     ACTION_TO_UI_ID_MAP.put(TURN_RIGHT, "TurnRight");
     ACTION_TO_UI_ID_MAP.put(BASIC_BREAK_BLOCK, "BasicBreakBlock");
     ACTION_TO_UI_ID_MAP.put(COMPLEX_BREAK_BLOCK, "ComplexBreakBlock");

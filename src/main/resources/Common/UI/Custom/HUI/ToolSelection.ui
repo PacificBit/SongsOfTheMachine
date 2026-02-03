@@ -6,7 +6,7 @@
 
 
 Group #DebugRoot {
-  Anchor: (Left: 590, Top: 880, Width: 820, Height: 40);
+  Anchor: (Left: 530, Top: 880, Width: 900, Height: 40);
   Background: (TexturePath: "../Common/PopupItem.png", Border: 20);
   LayoutMode: Left;
 
@@ -70,6 +70,22 @@ Group #DebugRoot {
       );
     }
   }
+
+  Group #TurnBack {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Turn Back";
+      Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+  }
+
 
   Group #TurnRight {
     Padding: (Full: 1);

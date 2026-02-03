@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum AncientConstructAction {
-  IDLE((byte) 0, "Idle", 0.25f, "SFX_SOTM_Track_1"),
-  MOVE_FORWARD((byte) 1, "Advance", 0.25f, "SFX_SOTM_Track_3"),
-  MOVE_BACK((byte) 2, "Retreat", 0.25f, "SFX_SOTM_Track_5"),
-  TURN_LEFT((byte) 3, "Turn Left", 0.25f, "SFX_SOTM_Track_3"),
-  TURN_RIGHT((byte) 4, "Turn Right", 0.25f, "SFX_SOTM_Track_4"),
-  BASIC_BREAK_BLOCK((byte) 5, "Chisel", 0.25f, "SFX_SOTM_Track_5"),
-  COMPLEX_BREAK_BLOCK((byte) 6, "Excavate", 0.25f, "SFX_SOTM_Track_6"),
-  DROP_IN_CONTAINER((byte) 7, "Deposit", 0.25f, "SFX_SOTM_Track_7"),
-  TAKE_OUTPUT_BENCH((byte) 8, "Collect", 0.25f, "SFX_SOTM_Track_6");
+  IDLE((byte) 0, "Idle", 0.25f, 0.30f, "SFX_SOTM_Track_1"),
+  MOVE_FORWARD((byte) 1, "Advance", 0.25f, 0.20f, "SFX_SOTM_Track_3"),
+  MOVE_BACK((byte) 2, "Retreat", 0.25f, 0.20f, "SFX_SOTM_Track_5"),
+  TURN_LEFT((byte) 3, "Turn Left", 0.25f, 0.20f, "SFX_SOTM_Track_3"),
+  TURN_RIGHT((byte) 4, "Turn Right", 0.25f, 0.20f, "SFX_SOTM_Track_4"),
+  BASIC_BREAK_BLOCK((byte) 5, "Chisel", 0.25f, 0.45f, "SFX_SOTM_Track_5"),
+  COMPLEX_BREAK_BLOCK((byte) 6, "Excavate", 0.25f, 0.50f, "SFX_SOTM_Track_6"),
+  DROP_IN_CONTAINER((byte) 7, "Deposit", 0.25f, 0.30f, "SFX_SOTM_Track_7"),
+  TAKE_OUTPUT_BENCH((byte) 8, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6");
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();
@@ -36,6 +36,7 @@ public enum AncientConstructAction {
   private final String name;
   private final String soundId;
   private final float executionTime; // in secs
+  private final float cooldownTime; // in secs
 
   static {
     for (AncientConstructAction action : values()) {
@@ -60,11 +61,12 @@ public enum AncientConstructAction {
     return ACTION_TO_UI_ID_MAP.get(action);
   }
 
-  AncientConstructAction(byte id, String name, float executionTime, String soundId) {
+  AncientConstructAction(byte id, String name, float executionTime, float cooldownTime, String soundId) {
     this.id = id;
     this.executionTime = executionTime;
     this.name = name;
     this.soundId = soundId;
+    this.cooldownTime = cooldownTime;
   }
 
   public byte getId() {
@@ -81,6 +83,10 @@ public enum AncientConstructAction {
 
   public String getSoundId() {
     return this.soundId;
+  }
+
+  public float getCooldownTime() {
+    return this.cooldownTime;
   }
 
   public static AncientConstructAction fromByte(byte id) {

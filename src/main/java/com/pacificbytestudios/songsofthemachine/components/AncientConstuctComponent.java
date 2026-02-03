@@ -34,7 +34,10 @@ public class AncientConstuctComponent extends ItemContainerState {
           (obj, value) -> obj.storage = value,
           (obj) -> obj.getItemContainer())
       .add()
-
+      .append(new KeyedCodec<>("CooldownMultiplier", Codec.FLOAT),
+          (obj, value) -> obj.cooldownMultiplier = value,
+          (obj) -> obj.cooldownMultiplier)
+      .add()
       .build();
 
   private AncientConstructStatus status;
@@ -45,6 +48,8 @@ public class AncientConstuctComponent extends ItemContainerState {
   private byte bkActionCount;
   private float clock;
   private float timeout;
+  private float cooldown;
+  private float cooldownMultiplier = 1;
   private byte actionCapacity;
   private ItemContainer storage;
   private UUID listeningToPlayerInstrumentId;
@@ -90,6 +95,10 @@ public class AncientConstuctComponent extends ItemContainerState {
       return true;
     }
     return false;
+  }
+
+  public boolean hasCooldownTerminated() {
+    return this.clock >= this.cooldown;
   }
 
   public float getTime() {
@@ -138,6 +147,10 @@ public class AncientConstuctComponent extends ItemContainerState {
     return this.actionCount;
   }
 
+  public void setCooldown(float cooldown) {
+    this.cooldown = cooldown * this.cooldownMultiplier;
+  }
+
   public void setActionCapacity(byte actionCapacity) {
     this.status = AncientConstructStatus.LISTENING;
     this.actionCapacity = actionCapacity;
@@ -146,6 +159,7 @@ public class AncientConstuctComponent extends ItemContainerState {
   public boolean canBeInterrupted() {
     return this.status == AncientConstructStatus.LISTENING ||
         this.status == AncientConstructStatus.IDLE ||
+        this.status == AncientConstructStatus.COOLDOWN ||
         this.loopActions;
   }
 
@@ -207,6 +221,8 @@ public class AncientConstuctComponent extends ItemContainerState {
     c.bkActionBuffer = this.bkActionBuffer;
     c.bkActionCount = this.bkActionCount;
     c.loopActions = this.loopActions;
+    c.cooldown = this.cooldown;
+    c.cooldownMultiplier = this.cooldownMultiplier;
     c.storage = EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new);
     return c;
   }
@@ -222,6 +238,8 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.loopActions = other.loopActions;
     this.bkActionBuffer = other.bkActionBuffer;
     this.bkActionCount = other.bkActionCount;
+    this.cooldown = other.cooldown;
+    this.cooldownMultiplier = other.cooldownMultiplier;
   }
 
   @Override

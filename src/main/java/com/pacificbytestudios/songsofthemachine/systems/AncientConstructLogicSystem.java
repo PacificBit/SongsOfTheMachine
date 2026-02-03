@@ -119,6 +119,13 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       });
     }
 
+    if (construct.getStatus() == AncientConstructStatus.COOLDOWN) {
+      if (!construct.hasCooldownTerminated()) {
+        return;
+      }
+      construct.setStatus(AncientConstructStatus.EXECUTING);
+    }
+
     if (construct.getStatus() == AncientConstructStatus.READY_TO_EXECUTE) {
       construct.setStatus(AncientConstructStatus.EXECUTING);
       construct.resetTime();
@@ -129,6 +136,11 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       return;
     } else if (construct.getStatus() == AncientConstructStatus.EXECUTING) {
       AncientConstructAction action = construct.getNextAction();
+
+      if (action == null) {
+        construct.setStatus(AncientConstructStatus.COMPLETED);
+        return;
+      }
 
       if (construct.getTime() >= action.getExecutionTime()) {
         System.out.println("[AncientConstructLogicSystem] Executing next instruction: " + action);
@@ -141,6 +153,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         }
         construct.clearNextAction();
         construct.resetTime();
+        construct.setStatus(AncientConstructStatus.COOLDOWN);
+        construct.setCooldown(action.getCooldownTime());
         System.out.println("[AncientConstructLogicSystem] Done exucuting: " + action);
         System.out
             .println(

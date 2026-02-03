@@ -1,4 +1,4 @@
-@Container = (TexturePath: "../Common/DropdownBox.png", Border: 20);
+@Container = (TexturePath: "../Common/InputBox.png", Border: 20);
 @Empty = #000000(0.0);
 @Active = (TexturePath: "../Common/ScrollbarHandleHovered.png", Border: 0);
 @NotActive = (TexturePath: "../Common/ScrollbarHandleDragged.png", Border: 0);
@@ -6,7 +6,7 @@
 
 
 Group #DebugRoot {
-  Anchor: (Left: 625, Top: 880, Width: 820, Height: 40);
+  Anchor: (Left: 590, Top: 880, Width: 820, Height: 40);
   Background: (TexturePath: "../Common/PopupItem.png", Border: 20);
   LayoutMode: Left;
 
@@ -17,6 +17,12 @@ Group #DebugRoot {
     Label {
       Text: "Idle";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -26,6 +32,12 @@ Group #DebugRoot {
     Label {
       Text: "Move Forward";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -35,6 +47,12 @@ Group #DebugRoot {
     Label {
       Text: "Move Back";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -44,6 +62,12 @@ Group #DebugRoot {
     Label {
       Text: "Turn Left";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -53,6 +77,12 @@ Group #DebugRoot {
     Label {
       Text: "Turn Right";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -62,6 +92,12 @@ Group #DebugRoot {
     Label {
       Text: "Chisel";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -71,6 +107,12 @@ Group #DebugRoot {
     Label {
       Text: "Excavate";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -80,6 +122,12 @@ Group #DebugRoot {
     Label {
       Text: "Deposit";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 
@@ -89,13 +137,19 @@ Group #DebugRoot {
     Label {
       Text: "Collect";
       Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
     }
   }
 }
 
 
 Group #ActionBuffer {
-  Anchor: (Left: 970, Top: 840, Width: 120, Height: 40);
+  Anchor: (Left: 950, Top: 840, Width: 120, Height: 40);
   Background: (TexturePath: "../Common/PopupItem.png", Border: 20);
   LayoutMode: Left;
 
@@ -106,7 +160,7 @@ Group #ActionBuffer {
     Group #Action1 {
       Background: @NotActive;
       Anchor: (Width: 20, Height: 20);
-    Padding: (Full: 12);
+      Padding: (Full: 12);
     }
   }
 
@@ -117,7 +171,7 @@ Group #ActionBuffer {
     Group #Action2 {
       Background: @NotActive;
       Anchor: (Width: 20, Height: 20);
-    Padding: (Full: 12);
+      Padding: (Full: 12);
     }
   }
 
@@ -128,7 +182,7 @@ Group #ActionBuffer {
     Group #Action3 {
       Background: @NotActive;
       Anchor: (Width: 20, Height: 20);
-    Padding: (Full: 12);
+      Padding: (Full: 12);
     }
   }
 
@@ -139,8 +193,88 @@ Group #ActionBuffer {
     Group #Action4 {
       Background: @NotActive;
       Anchor: (Width: 20, Height: 20);
-    Padding: (Full: 12);
+      Padding: (Full: 12);
     }
   }
 }
 
+
+Group #Legend {
+  Anchor: (Left: 50, Top: 930, Width: 120, Height: 40);
+  LayoutMode: Top;
+
+  Group #ActivateTool {
+    LayoutMode: Left;
+
+    Group #ActionIcon {
+      Anchor: (Width: 30, Height: 30);
+      Background: (TexturePath: "../Common/InputBinding.png", Border: 3);
+      LayoutMode: CenterMiddle;
+
+      Label {
+        Text: "F";
+        Style: (
+          FontSize: 15,
+          HorizontalAlignment: End,
+          VerticalAlignment: End,
+          RenderBold: true,
+        );
+      }
+    }
+
+    Label {
+      Text: "Play sound";
+      Padding: (Full: 3);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+  }
+
+  Group #GoPrev {
+    LayoutMode: Left;
+    Padding: (Top: 12);
+
+    Group #ActionIcon {
+      Anchor: (Width: 30, Height: 30);
+      Background: (TexturePath: "Mouse_Left.png", Border: 3);
+      LayoutMode: CenterMiddle;
+    }
+
+    Label {
+      Text: "Previous sound";
+      Padding: (Full: 3);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+  }
+
+  Group #GoNext {
+    LayoutMode: Left;
+    Padding: (Top: 12);
+
+    Group #ActionIcon {
+      Anchor: (Width: 30, Height: 30);
+      Background: (TexturePath: "Mouse_Right.png", Border: 3);
+      LayoutMode: CenterMiddle;
+    }
+
+    Label {
+      Text: "Next sound";
+      Padding: (Full: 3);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+  }
+}

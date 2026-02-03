@@ -57,7 +57,8 @@
           "Command Timeout": 40,
           "Storage": {
             "Capacity": 18
-          }
+          },
+          "CooldownMultiplier": 1
         }
       }
     },

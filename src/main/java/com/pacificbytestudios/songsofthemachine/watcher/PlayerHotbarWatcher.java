@@ -13,6 +13,7 @@ import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransac
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
@@ -43,7 +44,12 @@ public class PlayerHotbarWatcher implements PlayerPacketWatcher {
     short from = (short) chain.activeHotbarSlot;
     short to = (short) chain.data.targetSlot;
 
-    Universe.get().getWorld(playerRef.getWorldUuid()).execute(() -> {
+    World world = Universe.get().getWorld(playerRef.getWorldUuid());
+    if (world == null) {
+      System.err.println("[PlayerHotbarWatcher] onHotbarSlotSwitch - WORLD NOT FOUND");
+      return;
+    }
+    world.execute(() -> {
       Ref<EntityStore> entityRef = playerRef.getReference();
       if (!entityRef.isValid()) {
         System.err.println("[PlayerHotbarWatcher] onHotbarSlotSwitch - Invalid player ref");

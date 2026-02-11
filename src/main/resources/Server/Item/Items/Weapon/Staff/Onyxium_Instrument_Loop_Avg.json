@@ -96,9 +96,6 @@
             "Type": "MusicToolUseInteraction",
             "Quality": 2,
             "ActionsCapacity": 2,
-            "Action": {
-              "Move Forward": true
-            },
             "IsLoopingInstrument": true
           },
           "Effects": {

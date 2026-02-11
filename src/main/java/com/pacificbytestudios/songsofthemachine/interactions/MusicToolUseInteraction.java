@@ -23,7 +23,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
-import com.pacificbytestudios.songsofthemachine.customcodec.ActionSelection;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 import com.pacificbytestudios.songsofthemachine.enums.MusicToolQuality;
@@ -34,11 +33,6 @@ import com.pacificbytestudios.songsofthemachine.utils.Utils;
 public class MusicToolUseInteraction extends SimpleInteraction {
   public static final BuilderCodec<MusicToolUseInteraction> CODEC = BuilderCodec
       .builder(MusicToolUseInteraction.class, MusicToolUseInteraction::new, SimpleInteraction.CODEC)
-      .append(
-          new KeyedCodec<>("Action", ActionSelection.CODEC),
-          (obj, value) -> obj.action = value.getAction(),
-          obj -> null)
-      .add()
       .append(
           new KeyedCodec<>("Quality", Codec.BYTE),
           (obj, value) -> obj.quality = value,
@@ -55,7 +49,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
       .add()
       .build();
 
-  private AncientConstructAction action;
+  private AncientConstructAction action = AncientConstructAction.IDLE;
   private byte quality;
   private Byte actionCapacity;
   private boolean isLoopingInstrument;

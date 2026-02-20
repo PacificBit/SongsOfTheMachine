@@ -27,14 +27,73 @@ public class AncientConstuctComponent extends ItemContainerState {
           (obj, value) -> obj.timeout = value,
           (obj) -> obj.timeout)
       .add()
+
       .append(new KeyedCodec<>("Storage", ItemContainer.CODEC),
           (obj, value) -> obj.storage = value,
           (obj) -> obj.getItemContainer())
       .add()
+
       .append(new KeyedCodec<>("CooldownMultiplier", Codec.FLOAT),
           (obj, value) -> obj.cooldownMultiplier = value,
           (obj) -> obj.cooldownMultiplier)
       .add()
+
+      // used to wake up entity when the chunk loads back
+      .append(new KeyedCodec<>("ActionBuffer", Codec.LONG),
+          (obj, value) -> obj.actionBuffer = value,
+          (obj) -> obj.actionBuffer)
+      .add()
+
+      .append(new KeyedCodec<>("BKActionBuffer", Codec.LONG),
+          (obj, value) -> obj.bkActionBuffer = value,
+          (obj) -> obj.bkActionBuffer)
+      .add()
+
+      .append(new KeyedCodec<>("ActionCount", Codec.BYTE),
+          (obj, value) -> obj.actionCount = value,
+          (obj) -> obj.actionCount)
+      .add()
+
+      .append(new KeyedCodec<>("BKActionCount", Codec.BYTE),
+          (obj, value) -> obj.bkActionCount = value,
+          (obj) -> obj.bkActionCount)
+      .add()
+
+      .append(new KeyedCodec<>("Clock", Codec.FLOAT),
+          (obj, value) -> obj.clock = value,
+          (obj) -> obj.clock)
+      .add()
+
+      .append(new KeyedCodec<>("Timeout", Codec.FLOAT),
+          (obj, value) -> obj.timeout = value,
+          (obj) -> obj.timeout)
+      .add()
+
+      .append(new KeyedCodec<>("Cooldown", Codec.FLOAT),
+          (obj, value) -> obj.cooldown = value,
+          (obj) -> obj.cooldown)
+      .add()
+
+      .append(new KeyedCodec<>("ActionCapacity", Codec.BYTE),
+          (obj, value) -> obj.actionCapacity = value,
+          (obj) -> obj.actionCapacity)
+      .add()
+
+      .append(new KeyedCodec<>("ListeningToPlayerInstrumentId", Codec.STRING),
+          (obj, value) -> obj.listeningToPlayerInstrumentId = value == null ? null : UUID.fromString(value),
+          (obj) -> obj.listeningToPlayerInstrumentId == null ? null : obj.listeningToPlayerInstrumentId.toString())
+      .add()
+
+      .append(new KeyedCodec<>("LoopActions", Codec.BOOLEAN),
+          (obj, value) -> obj.loopActions = value,
+          (obj) -> obj.loopActions)
+      .add()
+
+      .append(new KeyedCodec<>("Status", Codec.BYTE),
+          (obj, value) -> obj.status = AncientConstructStatus.fromByte(value),
+          (obj) -> obj.status.getId())
+      .add()
+
       .build();
 
   private AncientConstructStatus status;
@@ -243,5 +302,4 @@ public class AncientConstuctComponent extends ItemContainerState {
     return this.storage == null ? EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new)
         : this.storage;
   }
-
 }

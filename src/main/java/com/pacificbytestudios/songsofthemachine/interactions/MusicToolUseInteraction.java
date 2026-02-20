@@ -68,8 +68,8 @@ public class MusicToolUseInteraction extends SimpleInteraction {
       InteractionType type,
       InteractionContext context,
       CooldownHandler cooldownHandler) {
-    System.out.println(
-        "[MusicToolInteraction] Music tool action: " + action.getId());
+    // System.out.println(
+    // "[MusicToolInteraction] Music tool action: " + action.getId());
     Ref<EntityStore> playerRef = context.getEntity();
     World world = playerRef.getStore().getExternalData().getWorld();
 
@@ -86,7 +86,8 @@ public class MusicToolUseInteraction extends SimpleInteraction {
         this.action = AncientConstructAction.IDLE;
       }
 
-      System.out.println("[MusicToolUseInteraction] Using current tool to apply the action: " + this.action);
+      // System.out.println("[MusicToolUseInteraction] Using current tool to apply the
+      // action: " + this.action);
 
       TransformComponent transformComponent = playerRef.getStore()
           .getComponent(playerRef, TransformComponent.getComponentType());
@@ -145,15 +146,17 @@ public class MusicToolUseInteraction extends SimpleInteraction {
             continue;
           }
 
-          System.out.println("[MusicToolInteraction] Found AncientConstruct at: " + constructPos);
+          // System.out.println("[MusicToolInteraction] Found AncientConstruct at: " +
+          // constructPos);
 
           AncientConstuctComponent ancientConstruct = construct.getStore().getComponent(construct,
               AncientConstuctComponent.getComponentType());
 
           if (ancientConstruct == null || !ancientConstruct.canBeInterrupted()) {
-            System.out.println("[MusicToolInteraction] Cannot interact with component");
-            System.out
-                .println("Status " + ancientConstruct.getStatus() + " is looping " + ancientConstruct.getIsLooping());
+            System.err.println("[MusicToolInteraction] Cannot interact with component");
+            // System.out
+            // .println("Status " + ancientConstruct.getStatus() + " is looping " +
+            // ancientConstruct.getIsLooping());
             continue;
           }
 
@@ -170,7 +173,7 @@ public class MusicToolUseInteraction extends SimpleInteraction {
           ancientConstruct.setActionLoop(this.isLoopingInstrument);
 
           if (ancientConstruct.addAction(action, musicTool.getUUID())) {
-            System.out.println("[MusicToolInteraction] Action added successfully");
+            // System.out.println("[MusicToolInteraction] Action added successfully");
             this.constructStore.addAncient(construct);
             this.huiStorage.getMusicToolHui(musicTool.getUUID()).updateActionCount(
                 ancientConstruct.getBufferLoad(),

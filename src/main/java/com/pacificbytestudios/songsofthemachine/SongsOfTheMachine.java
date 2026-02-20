@@ -39,10 +39,11 @@ public final class SongsOfTheMachine extends JavaPlugin {
 
     this.ancientConstructorComponentType = this.getChunkStoreRegistry()
         .registerComponent(AncientConstuctComponent.class, "AncientConstuctComponent", AncientConstuctComponent.CODEC);
-    System.out.println("[SongsOfTheMachine] Registered AncientConstuctComponent");
+    // System.out.println("[SongsOfTheMachine] Registered
+    // AncientConstuctComponent");
     this.musicToolComponentType = this.getChunkStoreRegistry()
         .registerComponent(MusicToolComponent.class, "MusicToolComponent", MusicToolComponent.CODEC);
-    System.out.println("[SongsOfTheMachine] Registered MusicToolComponent");
+    // System.out.println("[SongsOfTheMachine] Registered MusicToolComponent");
 
     this.getCodecRegistry(Interaction.CODEC)
         .register(
@@ -55,18 +56,19 @@ public final class SongsOfTheMachine extends JavaPlugin {
         .register("CallToActionInteraction",
             CallToActionInteraction.class,
             CallToActionInteraction.CODEC);
-    System.out.println("[SongsOfTheMachine] Registered MusicToolUseInteraction & MusicToolChangeActionInteraction");
+    // System.out.println("[SongsOfTheMachine] Registered MusicToolUseInteraction &
+    // MusicToolChangeActionInteraction");
 
     this.getChunkStoreRegistry().registerSystem(new AncientConstructPlacementSystem());
-    System.out.println("[SongsOfTheMachine] Registered placement system");
+    // System.out.println("[SongsOfTheMachine] Registered placement system");
     this.getChunkStoreRegistry().registerSystem(new AncientConstructLogicSystem());
-    System.out.println("[SongsOfTheMachine] Registered construct logic");
+    // System.out.println("[SongsOfTheMachine] Registered construct logic");
 
     this.packetFilter = PacketAdapters.registerInbound(new PlayerHotbarWatcher());
-    System.out.println("[SongsOfTheMachine] Registered player hotbar watcher");
+    // System.out.println("[SongsOfTheMachine] Registered player hotbar watcher");
 
     this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerReadyHandler::handle);
-    System.out.println("[SongsOfTheMachine] Registered player ready handler");
+    // System.out.println("[SongsOfTheMachine] Registered player ready handler");
   }
 
   @Override

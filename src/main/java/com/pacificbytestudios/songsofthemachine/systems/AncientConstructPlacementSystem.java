@@ -35,7 +35,7 @@ public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
     }
 
     this.store.setAncientConstructChunkId(chunkRef, ref);
-    System.out.println("[AncientConstructPlacementSystem] Added new entity. Reason: " + reason);
+//     System.out.println("[AncientConstructPlacementSystem] Added new entity. Reason: " + reason);
 
     if (reason == AddReason.LOAD) {
       this.store.addAncient(ref);
@@ -59,7 +59,7 @@ public class AncientConstructPlacementSystem extends RefSystem<ChunkStore> {
     this.store.removeAncient(ref);
     this.store.removeAncientConstructFromChunkId(chunkRef, ref);
 
-    System.out.println("[AncientConstructPlacementSystem] Removed entity. Reason: " + reason);
+//     System.out.println("[AncientConstructPlacementSystem] Removed entity. Reason: " + reason);
   }
 
   @Override

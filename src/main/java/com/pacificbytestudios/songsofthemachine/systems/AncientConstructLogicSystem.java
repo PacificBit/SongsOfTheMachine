@@ -1,6 +1,5 @@
 package com.pacificbytestudios.songsofthemachine.systems;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,9 +136,10 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       construct.setStatus(AncientConstructStatus.EXECUTING);
       construct.resetTime();
       clearInstrumentHUI(construct.getListeningInstrumentId(), construct.getActionCapacity());
-      System.out.println("=======================================================");
-      System.out.println(
-          "[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getRemainingActions()));
+      // System.out.println("=======================================================");
+      // System.out.println(
+      // "[AncientConstructLogicSystem] Instruction list: " +
+      // Arrays.toString(construct.getRemainingActions()));
       return;
     } else if (construct.getStatus() == AncientConstructStatus.EXECUTING) {
       AncientConstructAction action = construct.getNextAction();
@@ -150,7 +150,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       }
 
       if (construct.getTime() >= action.getExecutionTime()) {
-        System.out.println("[AncientConstructLogicSystem] Executing next instruction: " + action);
+        // System.out.println("[AncientConstructLogicSystem] Executing next instruction:
+        // " + action);
         BlockModule.BlockStateInfo info = chunkStore.getComponent(entityRef,
             BlockModule.BlockStateInfo.getComponentType());
         if (info != null) {
@@ -164,17 +165,21 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         construct.resetTime();
         construct.setStatus(AncientConstructStatus.COOLDOWN);
         construct.setCooldown(action.getCooldownTime());
-        System.out.println("[AncientConstructLogicSystem] Done exucuting: " + action);
-        System.out
-            .println(
-                "[AncientConstructLogicSystem] Instruction list: " + Arrays.toString(construct.getRemainingActions()));
-        System.out
-            .println(
-                "[AncientConstructLogicSystem] Exiting with State: " + construct.getStatus());
+        // System.out.println("[AncientConstructLogicSystem] Done exucuting: " +
+        // action);
+        // System.out
+        // .println(
+        // "[AncientConstructLogicSystem] Instruction list: " +
+        // Arrays.toString(construct.getRemainingActions()));
+        // System.out
+        // .println(
+        // "[AncientConstructLogicSystem] Exiting with State: " +
+        // construct.getStatus());
       }
       return;
     } else if (construct.getStatus() == AncientConstructStatus.COMPLETED) {
-      System.out.println("[AncientConstructLogicSystem] Completed instruction set");
+      // System.out.println("[AncientConstructLogicSystem] Completed instruction
+      // set");
       construct.clearActionBuffer();
       this.ancientConstructStore.removeAncient(entityRef);
       return;
@@ -183,7 +188,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     if (construct.resetClockIfTimeout()) {
       this.ancientConstructStore.removeAncient(entityRef);
       construct.clearActionBuffer();
-      System.out.println("[AncientConstructLogicSystem] Entity command timeout");
+      // System.out.println("[AncientConstructLogicSystem] Entity command timeout");
       clearInstrumentHUI(construct.getListeningInstrumentId(), construct.getActionCapacity());
     }
   }
@@ -195,7 +200,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       Vector3i blockPos,
       AncientConstructAction action) {
     if (!context.isValid()) {
-      System.out.println("[AncientConstructLogicSystem] execute() - Invalid world context");
+      // System.out.println("[AncientConstructLogicSystem] execute() - Invalid world
+      // context");
       return;
     }
 
@@ -240,7 +246,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           AncientConstuctComponent.getComponentType());
 
       if (moveTarget == null) {
-        System.out.println("[AncientConstructLogicSystem] move - Cannot move");
+        System.err.println("[AncientConstructLogicSystem] move - Cannot move");
         oldComponent.setStatus(AncientConstructStatus.ERROR);
         return;
       }
@@ -279,7 +285,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       this.ancientConstructStore.addAncient(newEntityRef);
 
       if (chunk.getIndex() != context.getChunk().getIndex()) {
-        System.out.println("[AncientConstructLogicSystem] Moving into new chunk");
+        // System.out.println("[AncientConstructLogicSystem] Moving into new chunk");
         this.ancientConstructStore.removeAncientConstructFromChunkId(context.getChunk().getReference(), entityRef);
         this.ancientConstructStore.setAncientConstructChunkId(chunk.getReference(), newEntityRef);
       }
@@ -459,7 +465,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
             newPos.x, newPos.y, newPos.z, true);
 
         if (blockData == null || blockData.getContainerData() == null || containerState == null) {
-          System.out.println("[AncientConstructLogicSystem] dropInContainer - No valid container found");
+          System.err.println("[AncientConstructLogicSystem] dropInContainer - No valid container found");
           component.setStatus(AncientConstructStatus.ERROR);
           return;
         }
@@ -530,7 +536,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           blockTypeBench != null &&
           blockTypeBench.equals(benchState.getBench()) &&
           benchState.initialize(blockType)) {
-        System.out.println("[AncientConstructLogicSystem] takeBenchOutput - Found working bench");
+        // System.out.println("[AncientConstructLogicSystem] takeBenchOutput - Found
+        // working bench");
 
         if (blockTypeBench.getType() != BenchType.Processing) {
           System.err.println("[AncientConstructLogicSystem] takeBenchOutput - Is not a processing bench");
@@ -570,7 +577,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     if (ancientConstruct.getInstructionSubPhase() == AncientConstuctComponent.EMPTY_SUB_INSTR) {
       Vector3i normalizedDir = normalizedDirection(context, blockPos, DIRECTION_FORWARD);
       Vector3i target = blockPos.clone().add(normalizedDir.scale(TunnellingPhase.MAX_RANGE));
-      System.out.println("[tunnel] Starting tunnelling from: " + blockPos + " to: " + target);
+      // System.out.println("[tunnel] Starting tunnelling from: " + blockPos + " to: "
+      // + target);
 
       ancientConstruct.getWaypoints().push(blockPos);
       ancientConstruct.setInstructionSubPhase(TunnellingPhase.EXCAVATE.getPhase());
@@ -580,7 +588,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     switch (TunnellingPhase.fromId(ancientConstruct.getInstructionSubPhase())) {
       case TunnellingPhase.EXCAVATE:
         breakBlock(context, entityRef, blockPos, AncientConstructAction.COMPLEX_BREAK_BLOCK);
-        System.out.println("[tunnel] Breaking blocks...");
+        // System.out.println("[tunnel] Breaking blocks...");
         ancientConstruct.setInstructionSubPhase(TunnellingPhase.MOVE_FORWARD.getPhase());
         break;
 
@@ -590,17 +598,17 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
         if (moveTarget == null || moveTarget.targetPos.equals(ancientConstruct.getTargetPos())) {
           ancientConstruct.setInstructionSubPhase(TunnellingPhase.RETURN_TO_ORIGIN.getPhase());
           if (AncientConstructAction.TUNNELLING.equals(ancientConstruct.getFollowingAction())) {
-            System.out.println("[tunnel] Starting new tunnelling...");
+            // System.out.println("[tunnel] Starting new tunnelling...");
             ancientConstruct.clearNextAction();
             ancientConstruct.setInstructionSubPhase(AncientConstuctComponent.EMPTY_SUB_INSTR);
             move(context, entityRef, blockPos, DIRECTION_FORWARD, moveTarget);
             break;
           }
           turn(context, entityRef, blockPos, AncientConstructAction.TURN_BACK);
-          System.out.println("[tunnel] Cannot move forward...");
+          // System.out.println("[tunnel] Cannot move forward...");
           break;
         }
-        System.out.println("[tunnel] Moving forward...");
+        // System.out.println("[tunnel] Moving forward...");
         move(context, entityRef, blockPos, DIRECTION_FORWARD, moveTarget);
         ancientConstruct.setInstructionSubPhase(TunnellingPhase.EXCAVATE.getPhase());
         break;
@@ -608,17 +616,17 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case RETURN_TO_ORIGIN:
         if (blockPos.equals(ancientConstruct.getWaypoints().peek())) {
           ancientConstruct.getWaypoints().pop();
-          System.out.println("[tunnel] Origin point reached");
+          // System.out.println("[tunnel] Origin point reached");
 
           if (ancientConstruct.getWaypoints().size() == 0) {
             ancientConstruct.clearNextAction();
             ancientConstruct.setInstructionSubPhase(AncientConstuctComponent.EMPTY_SUB_INSTR);
-            System.out.println("[tunnel] Last Origin point reached");
+            // System.out.println("[tunnel] Last Origin point reached");
             break;
           }
         }
 
-        System.out.println("[tunnel] Going back...");
+        // System.out.println("[tunnel] Going back...");
         move(context, entityRef, blockPos, DIRECTION_FORWARD);
         break;
 

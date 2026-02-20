@@ -41,8 +41,9 @@ public class ToolSelectionHUI extends CustomUIHud {
   public void updateActionCount(int count, int capacity) {
     UICommandBuilder commandBuilder = new UICommandBuilder();
 
-    System.out.println(
-        "[ToolSelectionHUI] updateActionCount - Updating used action. Count: " + count + ", Capacity: " + capacity);
+    // System.out.println(
+    // "[ToolSelectionHUI] updateActionCount - Updating used action. Count: " +
+    // count + ", Capacity: " + capacity);
     for (int i = 1; i < MusicToolComponent.MAX_CAPACITY + 1; i++) {
       if (i > capacity) {
         commandBuilder.set("#Action" + i + ".Visible", false);

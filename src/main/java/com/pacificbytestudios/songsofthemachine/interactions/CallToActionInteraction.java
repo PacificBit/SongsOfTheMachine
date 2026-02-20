@@ -121,15 +121,17 @@ public class CallToActionInteraction extends SimpleInteraction {
             continue;
           }
 
-          System.out.println("[CallToActionInteraction] Found AncientConstruct at: " + constructPos);
+          // System.out.println("[CallToActionInteraction] Found AncientConstruct at: " +
+          // constructPos);
 
           AncientConstuctComponent ancientConstruct = construct.getStore().getComponent(construct,
               AncientConstuctComponent.getComponentType());
 
           if (ancientConstruct == null || !ancientConstruct.canBeInterrupted()) {
-            System.out.println("[CallToActionInteraction] Cannot interact with component");
-            System.out
-                .println("Status " + ancientConstruct.getStatus() + " is looping " + ancientConstruct.getIsLooping());
+            System.err.println("[CallToActionInteraction] Cannot interact with component");
+            // System.out
+            // .println("Status " + ancientConstruct.getStatus() + " is looping " +
+            // ancientConstruct.getIsLooping());
             continue;
           }
 

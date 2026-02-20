@@ -108,18 +108,21 @@ public class PlayerHotbarWatcher implements PlayerPacketWatcher {
           System.err.println("[PlayerHotbarWatcher] Failed to assign UUID to slot " + to);
           return;
         } else {
-          System.out.println("[PlayerHotbarWatcher] Assigned new UUID to slot " + to + ": " + newUUID);
+          // System.out.println("[PlayerHotbarWatcher] Assigned new UUID to slot " + to +
+          // ": " + newUUID);
         }
 
         targetItem = updated;
       }
 
-      System.out.println(
-          "[PlayerHotbarWatcher] onHotbarSlotSwitch - Slot '" + to + "', music tool uuid: " + musicTool.getUUID());
+      // System.out.println(
+      // "[PlayerHotbarWatcher] onHotbarSlotSwitch - Slot '" + to + "', music tool
+      // uuid: " + musicTool.getUUID());
 
       ToolSelectionHUI hui = this.store.getMusicToolHui(musicTool.getUUID());
       if (hui == null) {
-        System.out.println("[PlayerHotbarWatcher] onHotbarSlotSwitch - Created new Tool selection hui");
+        // System.out.println("[PlayerHotbarWatcher] onHotbarSlotSwitch - Created new
+        // Tool selection hui");
         hui = new ToolSelectionHUI(playerRef);
         this.store.addMusicToolHui(musicTool.getUUID(), hui);
       }

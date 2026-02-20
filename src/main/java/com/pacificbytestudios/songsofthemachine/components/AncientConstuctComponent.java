@@ -308,7 +308,7 @@ public class AncientConstuctComponent extends ItemContainerState {
         this.actionBuffer = this.bkActionBuffer;
         return;
       }
-      System.out.println("[AncientConstuctComponent] clearNextAction - Completed all the scheduled actions");
+//       System.out.println("[AncientConstuctComponent] clearNextAction - Completed all the scheduled actions");
       this.status = AncientConstructStatus.COMPLETED;
     }
   }

@@ -331,7 +331,7 @@ public class AncientConstuctComponent extends ItemContainerState {
     c.cooldown = this.cooldown;
     c.cooldownMultiplier = this.cooldownMultiplier;
     c.storage = EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new);
-    c.waypoints = this.waypoints;
+    c.waypoints = new ArrayDeque<>();
     c.instructionSubPhase = this.instructionSubPhase;
     c.targetPos = this.targetPos;
     return c;

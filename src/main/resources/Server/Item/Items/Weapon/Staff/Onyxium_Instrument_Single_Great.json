@@ -97,7 +97,7 @@
           "Next": {
             "Type": "MusicToolUseInteraction",
             "Quality": 2,
-            "ActionsCapacity": 8
+            "ActionsCapacity": 10
           },
           "Effects": {
             "LocalSoundEventId": "SFX_SOTM_Track_2",

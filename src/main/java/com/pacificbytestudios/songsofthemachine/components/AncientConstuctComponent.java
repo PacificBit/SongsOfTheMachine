@@ -19,14 +19,8 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 public class AncientConstuctComponent extends ItemContainerState {
   private static final short STORAGE_CAPACITY = 18;
   private static final int BIT_ACTION_SIZE = 4;
-  private static final int MASK_SLOT_0 = 0x0000000F;
-  private static final int MASK_SLOT_1 = 0x000000F0;
-  private static final int MASK_SLOT_2 = 0x00000F00;
-  private static final int MASK_SLOT_3 = 0x0000F000;
-  private static final int MASK_SLOT_4 = 0x000F0000;
-  private static final int MASK_SLOT_5 = 0x00F00000;
-  private static final int MASK_SLOT_6 = 0x0F000000;
-  private static final int MASK_SLOT_7 = 0xF0000000;
+  private static final int MAX_ACTIONS = Long.SIZE / BIT_ACTION_SIZE;
+  private static final long ACTION_MASK = 0xFL;
 
   public static final BuilderCodec<AncientConstuctComponent> CODEC = BuilderCodec
       .builder(AncientConstuctComponent.class, AncientConstuctComponent::new)
@@ -46,9 +40,9 @@ public class AncientConstuctComponent extends ItemContainerState {
 
   private AncientConstructStatus status;
   private boolean loopActions;
-  private int actionBuffer;
+  private long actionBuffer = 0L;
+  private long bkActionBuffer = 0L;
   private byte actionCount;
-  private int bkActionBuffer;
   private byte bkActionCount;
   private float clock;
   private float timeout;
@@ -70,14 +64,14 @@ public class AncientConstuctComponent extends ItemContainerState {
       this.listeningToPlayerInstrumentId = listeningTo;
     }
 
-    if (this.actionCount > this.actionCapacity) {
+    if (this.actionCount >= this.actionCapacity) {
       this.status = AncientConstructStatus.ERROR;
       return false;
     }
 
-    int id = action.getId()
-        & 0xFF;
-    this.actionBuffer |= (id << (this.actionCount * BIT_ACTION_SIZE));
+    long id = (long) (action.getId() & 0x0F);
+    int shift = this.actionCount * BIT_ACTION_SIZE;
+    this.actionBuffer |= (id << shift);
     this.bkActionBuffer = actionBuffer;
     this.actionCount += 1;
     this.bkActionCount = this.actionCount;
@@ -115,15 +109,15 @@ public class AncientConstuctComponent extends ItemContainerState {
 
   public void clearActionBuffer() {
     this.status = AncientConstructStatus.LISTENING;
-    this.actionBuffer = 0;
-    this.bkActionBuffer = 0;
+    this.actionBuffer = 0L;
+    this.bkActionBuffer = 0L;
     this.actionCount = 0;
     this.bkActionCount = 0;
     this.loopActions = false;
     this.clock = 0f;
   }
 
-  public int getActionBuffer() {
+  public long getActionBuffer() {
     return this.actionBuffer;
   }
 
@@ -172,32 +166,23 @@ public class AncientConstuctComponent extends ItemContainerState {
   }
 
   public AncientConstructAction[] getRemainingActions() {
-    byte a0 = (byte) ((actionBuffer & MASK_SLOT_0) >>> 0);
-    byte a1 = (byte) ((actionBuffer & MASK_SLOT_1) >>> 4);
-    byte a2 = (byte) ((actionBuffer & MASK_SLOT_2) >>> 8);
-    byte a3 = (byte) ((actionBuffer & MASK_SLOT_3) >>> 12);
-    byte a4 = (byte) ((actionBuffer & MASK_SLOT_4) >>> 16);
-    byte a5 = (byte) ((actionBuffer & MASK_SLOT_5) >>> 20);
-    byte a6 = (byte) ((actionBuffer & MASK_SLOT_6) >>> 24);
-    byte a7 = (byte) ((actionBuffer & MASK_SLOT_7) >>> 28);
+    long buffer = this.actionBuffer;
+    AncientConstructAction[] remainingActions = new AncientConstructAction[this.actionCount];
 
-    return new AncientConstructAction[] {
-        AncientConstructAction.fromByte(a0),
-        AncientConstructAction.fromByte(a1),
-        AncientConstructAction.fromByte(a2),
-        AncientConstructAction.fromByte(a3),
-        AncientConstructAction.fromByte(a4),
-        AncientConstructAction.fromByte(a5),
-        AncientConstructAction.fromByte(a6),
-        AncientConstructAction.fromByte(a7)
-    };
+    for (int i = 0; i < this.actionCount; i++) {
+      byte id = (byte) (buffer & ACTION_MASK);
+      remainingActions[i] = AncientConstructAction.fromByte(id);
+      buffer >>>= BIT_ACTION_SIZE;
+    }
+
+    return remainingActions;
   }
 
   public AncientConstructAction getNextAction() {
     if (this.actionCount == 0) {
       return null;
     }
-    return AncientConstructAction.fromByte((byte) (actionBuffer & MASK_SLOT_0));
+    return AncientConstructAction.fromByte((byte) (this.actionBuffer & ACTION_MASK));
   }
 
   public void clearNextAction() {

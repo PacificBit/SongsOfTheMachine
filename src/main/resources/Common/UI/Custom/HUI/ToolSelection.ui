@@ -165,7 +165,7 @@ Group #DebugRoot {
 
 
 Group #ActionBuffer {
-  Anchor: (Left: 920, Top: 840, Width: 240, Height: 40);
+  Anchor: (Left: 880, Top: 840, Width: 300, Height: 40);
   Background: (TexturePath: "../Common/PopupItem.png", Border: 20);
   LayoutMode: Left;
 
@@ -251,6 +251,28 @@ Group #ActionBuffer {
     Padding: (Full: 12);
 
     Group #Action8 {
+      Background: @NotActive;
+      Anchor: (Width: 20, Height: 20);
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #ActionSlot9 {
+    Anchor: (Width: 30, Height: 40);
+    Padding: (Full: 12);
+
+    Group #Action9 {
+      Background: @NotActive;
+      Anchor: (Width: 20, Height: 20);
+      Padding: (Full: 12);
+    }
+  }
+
+  Group #ActionSlot10 {
+    Anchor: (Width: 30, Height: 40);
+    Padding: (Full: 12);
+
+    Group #Action10 {
       Background: @NotActive;
       Anchor: (Width: 20, Height: 20);
       Padding: (Full: 12);

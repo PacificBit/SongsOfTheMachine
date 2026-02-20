@@ -13,11 +13,11 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 
 public class MusicToolComponent implements Component<ChunkStore> {
   public static final String METADATA_KEY = "SongsOfTheMachine.MusicToolComponent";
-  public static final byte MAX_CAPACITY = 8;
+  public static final byte MAX_CAPACITY = 10;
 
   public static final byte LOW_CAPACITY = 1;
   public static final byte AVG_CAPACITY = 4;
-  public static final byte GREAT_CAPACITY = 8;
+  public static final byte GREAT_CAPACITY = 10;
 
   public static final BuilderCodec<MusicToolComponent> CODEC = BuilderCodec
       .builder(MusicToolComponent.class, MusicToolComponent::new)

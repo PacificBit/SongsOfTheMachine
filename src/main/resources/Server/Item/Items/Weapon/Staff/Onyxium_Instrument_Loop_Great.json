@@ -98,7 +98,7 @@
           "Next": {
             "Type": "MusicToolUseInteraction",
             "Quality": 2,
-            "ActionsCapacity": 4,
+            "ActionsCapacity": 8,
             "IsLoopingInstrument": true
           },
           "Effects": {

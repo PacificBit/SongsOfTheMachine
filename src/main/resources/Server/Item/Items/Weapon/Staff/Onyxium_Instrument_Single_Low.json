@@ -89,6 +89,9 @@
     "Use": {
       "Interactions": [
         {
+          "Type": "CallToActionInteraction"
+        },
+        {
           "Type": "Simple",
           "RunTime": 0.15,
           "Next": {

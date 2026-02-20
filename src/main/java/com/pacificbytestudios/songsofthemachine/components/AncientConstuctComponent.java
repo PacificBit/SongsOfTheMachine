@@ -18,11 +18,15 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 
 public class AncientConstuctComponent extends ItemContainerState {
   private static final short STORAGE_CAPACITY = 18;
-  private static final int BIT_ACTION_SIZE = 8;
-  private static final int MASK_SLOT_0 = 0x000000FF;
-  private static final int MASK_SLOT_1 = 0x0000FF00;
-  private static final int MASK_SLOT_2 = 0x00FF0000;
-  private static final int MASK_SLOT_3 = 0xFF000000;
+  private static final int BIT_ACTION_SIZE = 4;
+  private static final int MASK_SLOT_0 = 0x0000000F;
+  private static final int MASK_SLOT_1 = 0x000000F0;
+  private static final int MASK_SLOT_2 = 0x00000F00;
+  private static final int MASK_SLOT_3 = 0x0000F000;
+  private static final int MASK_SLOT_4 = 0x000F0000;
+  private static final int MASK_SLOT_5 = 0x00F00000;
+  private static final int MASK_SLOT_6 = 0x0F000000;
+  private static final int MASK_SLOT_7 = 0xF0000000;
 
   public static final BuilderCodec<AncientConstuctComponent> CODEC = BuilderCodec
       .builder(AncientConstuctComponent.class, AncientConstuctComponent::new)
@@ -169,15 +173,23 @@ public class AncientConstuctComponent extends ItemContainerState {
 
   public AncientConstructAction[] getRemainingActions() {
     byte a0 = (byte) ((actionBuffer & MASK_SLOT_0) >>> 0);
-    byte a1 = (byte) ((actionBuffer & MASK_SLOT_1) >>> 8);
-    byte a2 = (byte) ((actionBuffer & MASK_SLOT_2) >>> 16);
-    byte a3 = (byte) ((actionBuffer & MASK_SLOT_3) >>> 24);
+    byte a1 = (byte) ((actionBuffer & MASK_SLOT_1) >>> 4);
+    byte a2 = (byte) ((actionBuffer & MASK_SLOT_2) >>> 8);
+    byte a3 = (byte) ((actionBuffer & MASK_SLOT_3) >>> 12);
+    byte a4 = (byte) ((actionBuffer & MASK_SLOT_4) >>> 16);
+    byte a5 = (byte) ((actionBuffer & MASK_SLOT_5) >>> 20);
+    byte a6 = (byte) ((actionBuffer & MASK_SLOT_6) >>> 24);
+    byte a7 = (byte) ((actionBuffer & MASK_SLOT_7) >>> 28);
 
     return new AncientConstructAction[] {
         AncientConstructAction.fromByte(a0),
         AncientConstructAction.fromByte(a1),
         AncientConstructAction.fromByte(a2),
-        AncientConstructAction.fromByte(a3)
+        AncientConstructAction.fromByte(a3),
+        AncientConstructAction.fromByte(a4),
+        AncientConstructAction.fromByte(a5),
+        AncientConstructAction.fromByte(a6),
+        AncientConstructAction.fromByte(a7)
     };
   }
 

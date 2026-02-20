@@ -1,7 +1,7 @@
 {
   "Group": "com.pacificbytestudios",
   "Name": "songsofthemachine",
-  "Version": "0.1.2",
+  "Version": "0.2.0",
   "Main": "com.pacificbytestudios.songsofthemachine.SongsOfTheMachine",
   "ServerVersion": "2026.02.19-1a311a592",
   "Authors": [

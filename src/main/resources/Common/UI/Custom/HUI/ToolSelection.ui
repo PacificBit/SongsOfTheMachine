@@ -132,6 +132,21 @@ Group #DebugRoot {
     }
   }
 
+  Group #Tunnelling {
+    Padding: (Full: 1);
+    LayoutMode: Middle;
+    Label {
+      Text: "Tunnel";
+      Padding: (Full: 12);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+  }
+
   Group #DropInContainer {
     Padding: (Full: 1);
     LayoutMode: Middle;

@@ -39,7 +39,7 @@ public class AncientConstructStore {
   }
 
   public boolean hasPendingCommands(Ref<ChunkStore> entityRef) {
-    return this.ancientConstuctWithPendingCommands.contains(entityRef);
+    return ancientConstuctWithPendingCommands.contains(entityRef);
   }
 
   public void setAncientConstructChunkId(Ref<ChunkStore> chunkRef, Ref<ChunkStore> ancientConstructRef) {

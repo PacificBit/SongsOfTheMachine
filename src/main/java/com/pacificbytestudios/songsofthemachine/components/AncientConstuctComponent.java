@@ -1,11 +1,13 @@
 package com.pacificbytestudios.songsofthemachine.components;
 
+import java.util.ArrayDeque;
 import java.util.UUID;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.inventory.container.EmptyItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
@@ -15,11 +17,13 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.SongsOfTheMachine;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
+import com.pacificbytestudios.songsofthemachine.utils.Vector3iArrayDequeCodec;
 
 public class AncientConstuctComponent extends ItemContainerState {
   private static final short STORAGE_CAPACITY = 18;
   private static final int BIT_ACTION_SIZE = 4;
   private static final long ACTION_MASK = 0xFL;
+  public static final short EMPTY_SUB_INSTR = -1;
 
   public static final BuilderCodec<AncientConstuctComponent> CODEC = BuilderCodec
       .builder(AncientConstuctComponent.class, AncientConstuctComponent::new)
@@ -94,6 +98,21 @@ public class AncientConstuctComponent extends ItemContainerState {
           (obj) -> obj.status.getId())
       .add()
 
+      .append(new KeyedCodec<>("InstructionSubPhase", Codec.SHORT),
+          (obj, value) -> obj.instructionSubPhase = value,
+          (obj) -> obj.instructionSubPhase)
+      .add()
+
+      .append(new KeyedCodec<>("Waypoints", new Vector3iArrayDequeCodec()),
+          (obj, value) -> obj.waypoints = ((value == null) ? new ArrayDeque<>() : value),
+          (obj) -> obj.waypoints)
+      .add()
+
+      .append(new KeyedCodec<>("TargetPos", Vector3i.CODEC),
+          (obj, value) -> obj.targetPos = value,
+          (obj) -> obj.targetPos)
+      .add()
+
       .build();
 
   private AncientConstructStatus status;
@@ -108,7 +127,10 @@ public class AncientConstuctComponent extends ItemContainerState {
   private float cooldownMultiplier = 1;
   private byte actionCapacity;
   private ItemContainer storage;
+  private short instructionSubPhase = EMPTY_SUB_INSTR;
   private UUID listeningToPlayerInstrumentId;
+  private ArrayDeque<Vector3i> waypoints = new ArrayDeque<>();
+  private Vector3i targetPos;
 
   public AncientConstuctComponent() {
     this.clock = 0f;
@@ -173,6 +195,8 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.bkActionCount = 0;
     this.loopActions = false;
     this.clock = 0f;
+    this.instructionSubPhase = EMPTY_SUB_INSTR;
+    this.waypoints.clear();
   }
 
   public long getActionBuffer() {
@@ -207,6 +231,10 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.cooldown = cooldown * this.cooldownMultiplier;
   }
 
+  public ArrayDeque<Vector3i> getWaypoints() {
+    return this.waypoints;
+  }
+
   public void setActionCapacity(byte actionCapacity) {
     this.status = AncientConstructStatus.LISTENING;
     this.actionCapacity = actionCapacity;
@@ -221,6 +249,14 @@ public class AncientConstuctComponent extends ItemContainerState {
 
   public UUID getListeningInstrumentId() {
     return this.listeningToPlayerInstrumentId;
+  }
+
+  public short getInstructionSubPhase() {
+    return this.instructionSubPhase;
+  }
+
+  public void setInstructionSubPhase(short subPhase) {
+    this.instructionSubPhase = subPhase;
   }
 
   public AncientConstructAction[] getRemainingActions() {
@@ -241,6 +277,22 @@ public class AncientConstuctComponent extends ItemContainerState {
       return null;
     }
     return AncientConstructAction.fromByte((byte) (this.actionBuffer & ACTION_MASK));
+  }
+
+  public AncientConstructAction getFollowingAction() {
+    if (this.actionCount < 2) {
+      return null;
+    }
+    long following = (this.actionBuffer >>> BIT_ACTION_SIZE) & ACTION_MASK;
+    return AncientConstructAction.fromByte((byte) following);
+  }
+
+  public Vector3i getTargetPos() {
+    return this.targetPos;
+  }
+
+  public void setTargetPos(Vector3i target) {
+    this.targetPos = target;
   }
 
   public void clearNextAction() {
@@ -268,7 +320,7 @@ public class AncientConstuctComponent extends ItemContainerState {
   @Override
   public AncientConstuctComponent clone() {
     AncientConstuctComponent c = new AncientConstuctComponent();
-    c.status = AncientConstructStatus.LISTENING;
+    c.status = this.status;
     c.actionBuffer = this.actionBuffer;
     c.actionCount = this.actionCount;
     c.timeout = this.timeout;
@@ -279,6 +331,9 @@ public class AncientConstuctComponent extends ItemContainerState {
     c.cooldown = this.cooldown;
     c.cooldownMultiplier = this.cooldownMultiplier;
     c.storage = EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new);
+    c.waypoints = this.waypoints;
+    c.instructionSubPhase = this.instructionSubPhase;
+    c.targetPos = this.targetPos;
     return c;
   }
 
@@ -295,6 +350,9 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.bkActionCount = other.bkActionCount;
     this.cooldown = other.cooldown;
     this.cooldownMultiplier = other.cooldownMultiplier;
+    this.waypoints = other.waypoints;
+    this.instructionSubPhase = other.instructionSubPhase;
+    this.targetPos = other.targetPos;
   }
 
   @Override

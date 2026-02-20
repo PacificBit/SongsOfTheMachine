@@ -36,6 +36,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
+import com.pacificbytestudios.songsofthemachine.enums.TunnellingPhase;
 import com.pacificbytestudios.songsofthemachine.hui.ToolSelectionHUI;
 import com.pacificbytestudios.songsofthemachine.storage.AncientConstructStore;
 import com.pacificbytestudios.songsofthemachine.storage.MusicToolHUIStorage;
@@ -70,6 +71,12 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
   public AncientConstructLogicSystem() {
     ancientConstructStore = AncientConstructStore.get();
     huiStorage = MusicToolHUIStorage.get();
+  }
+
+  private record MoveTarget(
+      WorldChunk chunk,
+      Vector3i targetPos,
+      int rotation) {
   }
 
   @Override
@@ -151,7 +158,9 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           Vector3i blockPos = Utils.getBlockPosition(context.getChunk(), info.getIndex());
           execute(context, entityRef, construct, blockPos, action);
         }
-        construct.clearNextAction();
+        if (!action.isComplexInstruction()) {
+          construct.clearNextAction();
+        }
         construct.resetTime();
         construct.setStatus(AncientConstructStatus.COOLDOWN);
         construct.setCooldown(action.getCooldownTime());
@@ -200,6 +209,7 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case COMPLEX_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case DROP_IN_CONTAINER -> dropInContainer(context, entityRef, blockPos);
       case TAKE_OUTPUT_BENCH -> takeBenchOutput(context, entityRef, blockPos);
+      case TUNNELLING -> tunnel(context, entityRef, component, blockPos);
       case EARLY_EXIT -> {
       }
       case IDLE -> {
@@ -212,56 +222,34 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       Ref<ChunkStore> entityRef,
       Vector3i blockPos,
       int direction) {
+    MoveTarget moveTarget = computeMoveTarget(context, blockPos, direction);
+    this.move(context, entityRef, blockPos, direction, moveTarget);
+  }
+
+  private void move(
+      Utils.WorldContext context,
+      Ref<ChunkStore> entityRef,
+      Vector3i blockPos,
+      int direction,
+      MoveTarget moveTarget) {
     BlockType type = context.getChunk().getBlockType(blockPos);
 
     context.getWorld().execute(() -> {
-      int rotation = context.getChunk().getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
-
-      int xModifier = 0;
-      int zModifier = 0;
-
-      if ((rotation & 1) == 0) {
-        zModifier = ((rotation == 2) ? -1 : 1) * direction;
-      } else {
-        xModifier = ((rotation == 1) ? 1 : -1) * direction;
-      }
-
-      Vector3i newPos = new Vector3i(blockPos.x + xModifier, blockPos.y, blockPos.z + zModifier);
-      WorldChunk chunk = context.getWorld().getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
-      AncientConstuctComponent oldComponent = entityRef.getStore().getComponent(entityRef,
+      AncientConstuctComponent oldComponent = entityRef.getStore().getComponent(
+          entityRef,
           AncientConstuctComponent.getComponentType());
 
-      if (chunk == null) {
-        System.out.println("[AncientConstructLogicSystem] moveForward - Invalid new chunk");
-        return;
-      }
-
-      if (!chunk.getBlockType(newPos.clone().add(Vector3i.UP)).getId().equals(EMPTY_BLOCK_ID)) {
-        System.out.println("[AncientConstructLogicSystem] moveForward - Cannot move");
+      if (moveTarget == null) {
+        System.out.println("[AncientConstructLogicSystem] move - Cannot move");
         oldComponent.setStatus(AncientConstructStatus.ERROR);
         return;
       }
 
-      if (!chunk.getBlockType(newPos).getId().equals(EMPTY_BLOCK_ID)) {
-        newPos.add(Vector3i.UP);
-      }
+      WorldChunk chunk = moveTarget.chunk;
+      Vector3i newPos = moveTarget.targetPos;
+      int rotation = moveTarget.rotation;
 
-      Vector3i frontBottomBlock = newPos.clone().add(Vector3i.DOWN);
-      if (chunk.getBlockType(frontBottomBlock).getId().equals(EMPTY_BLOCK_ID)) {
-        if (!chunk.getBlockType(frontBottomBlock.add(Vector3i.DOWN)).getId().equals(EMPTY_BLOCK_ID)) {
-          newPos = frontBottomBlock.add(Vector3i.UP);
-        } else {
-          System.out.println("[AncientConstructLogicSystem] moveForward - Cannot move");
-          oldComponent.setStatus(AncientConstructStatus.ERROR);
-          return;
-        }
-      }
-
-      context.getChunk()
-          .breakBlock(
-              blockPos.x,
-              blockPos.y,
-              blockPos.z);
+      context.getChunk().breakBlock(blockPos.x, blockPos.y, blockPos.z);
 
       chunk.setBlock(
           newPos.x,
@@ -272,20 +260,24 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           rotation,
           0,
           0);
+
       Ref<ChunkStore> newEntityRef = chunk.getBlockComponentEntity(newPos.x, newPos.y, newPos.z);
 
-      AncientConstuctComponent newComponent = newEntityRef.getStore().getComponent(newEntityRef,
+      AncientConstuctComponent newComponent = newEntityRef.getStore().getComponent(
+          newEntityRef,
           AncientConstuctComponent.getComponentType());
       newComponent.copyFrom(oldComponent);
 
       int index = SoundEvent.getAssetMap().getIndex(MOVE_SOUND_ID);
-      SoundUtil.playSoundEvent3d(index,
+      SoundUtil.playSoundEvent3d(
+          index,
           SoundCategory.SFX,
           newPos.toVector3d(),
           context.getWorld().getEntityStore().getStore());
 
       this.ancientConstructStore.removeAncient(entityRef);
       this.ancientConstructStore.addAncient(newEntityRef);
+
       if (chunk.getIndex() != context.getChunk().getIndex()) {
         System.out.println("[AncientConstructLogicSystem] Moving into new chunk");
         this.ancientConstructStore.removeAncientConstructFromChunkId(context.getChunk().getReference(), entityRef);
@@ -491,7 +483,6 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
           newPos.toVector3d(),
           context.getWorld().getEntityStore().getStore());
     });
-
   }
 
   private void takeBenchOutput(
@@ -569,6 +560,74 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     });
   }
 
+  private void tunnel(
+      Utils.WorldContext context,
+      Ref<ChunkStore> entityRef,
+      AncientConstuctComponent ancientConstruct,
+      Vector3i blockPos) {
+
+    // If is a new tunnel
+    if (ancientConstruct.getInstructionSubPhase() == AncientConstuctComponent.EMPTY_SUB_INSTR) {
+      Vector3i normalizedDir = normalizedDirection(context, blockPos, DIRECTION_FORWARD);
+      Vector3i target = blockPos.clone().add(normalizedDir.scale(TunnellingPhase.MAX_RANGE));
+      System.out.println("[tunnel] Starting tunnelling from: " + blockPos + " to: " + target);
+
+      ancientConstruct.getWaypoints().push(blockPos);
+      ancientConstruct.setInstructionSubPhase(TunnellingPhase.EXCAVATE.getPhase());
+      ancientConstruct.setTargetPos(target);
+    }
+
+    switch (TunnellingPhase.fromId(ancientConstruct.getInstructionSubPhase())) {
+      case TunnellingPhase.EXCAVATE:
+        breakBlock(context, entityRef, blockPos, AncientConstructAction.COMPLEX_BREAK_BLOCK);
+        System.out.println("[tunnel] Breaking blocks...");
+        ancientConstruct.setInstructionSubPhase(TunnellingPhase.MOVE_FORWARD.getPhase());
+        break;
+
+      case TunnellingPhase.MOVE_FORWARD:
+        MoveTarget moveTarget = computeMoveTarget(context, blockPos, DIRECTION_FORWARD);
+
+        if (moveTarget == null || moveTarget.targetPos.equals(ancientConstruct.getTargetPos())) {
+          ancientConstruct.setInstructionSubPhase(TunnellingPhase.RETURN_TO_ORIGIN.getPhase());
+          if (AncientConstructAction.TUNNELLING.equals(ancientConstruct.getFollowingAction())) {
+            System.out.println("[tunnel] Starting new tunnelling...");
+            ancientConstruct.clearNextAction();
+            ancientConstruct.setInstructionSubPhase(AncientConstuctComponent.EMPTY_SUB_INSTR);
+            move(context, entityRef, blockPos, DIRECTION_FORWARD, moveTarget);
+            break;
+          }
+          turn(context, entityRef, blockPos, AncientConstructAction.TURN_BACK);
+          System.out.println("[tunnel] Cannot move forward...");
+          break;
+        }
+        System.out.println("[tunnel] Moving forward...");
+        move(context, entityRef, blockPos, DIRECTION_FORWARD, moveTarget);
+        ancientConstruct.setInstructionSubPhase(TunnellingPhase.EXCAVATE.getPhase());
+        break;
+
+      case RETURN_TO_ORIGIN:
+        if (blockPos.equals(ancientConstruct.getWaypoints().peek())) {
+          ancientConstruct.getWaypoints().pop();
+          System.out.println("[tunnel] Origin point reached");
+
+          if (ancientConstruct.getWaypoints().size() == 0) {
+            ancientConstruct.clearNextAction();
+            ancientConstruct.setInstructionSubPhase(AncientConstuctComponent.EMPTY_SUB_INSTR);
+            System.out.println("[tunnel] Last Origin point reached");
+            break;
+          }
+        }
+
+        System.out.println("[tunnel] Going back...");
+        move(context, entityRef, blockPos, DIRECTION_FORWARD);
+        break;
+
+      default:
+        throw new UnsupportedOperationException(
+            "[tunnel] Invalid subphase: '" + ancientConstruct.getInstructionSubPhase() + "'");
+    }
+  }
+
   private void clearInstrumentHUI(UUID musicToolId, int capacity) {
     ToolSelectionHUI hui = this.huiStorage.getMusicToolHui(musicToolId);
     if (hui == null) {
@@ -578,11 +637,84 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
     hui.updateActionCount(0, capacity);
   }
 
+  private Vector3i normalizedDirection(
+      Utils.WorldContext context,
+      Vector3i blockPos,
+      int direction) {
+    int rotation = context.getChunk().getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
+
+    int dx = 0, dz = 0;
+    if ((rotation & 1) == 0) {
+      dz = ((rotation == 2) ? -1 : 1) * direction;
+    } else {
+      dx = ((rotation == 1) ? 1 : -1) * direction;
+    }
+    return new Vector3i(dx, 0, dz);
+  }
+
+  private Vector3i newPositionVec(
+      Utils.WorldContext context,
+      Vector3i blockPos,
+      int direction) {
+    Vector3i modifier = normalizedDirection(context, blockPos, direction);
+
+    return new Vector3i(
+        blockPos.x + modifier.x,
+        blockPos.y,
+        blockPos.z + modifier.z);
+  }
+
+  private MoveTarget computeMoveTarget(
+      Utils.WorldContext context,
+      Vector3i blockPos,
+      int direction) {
+    int rotation = context.getChunk()
+        .getRotationIndex(
+            blockPos.x,
+            blockPos.y,
+            blockPos.z);
+    Vector3i newPos = newPositionVec(context, blockPos, direction);
+
+    WorldChunk chunk = context.getWorld()
+        .getChunk(ChunkUtil.indexChunkFromBlock(newPos.x, newPos.z));
+
+    if (chunk == null) {
+      return null;
+    }
+
+    if (!chunk.getBlockType(newPos.clone().add(Vector3i.UP))
+        .getId().equals(EMPTY_BLOCK_ID)) {
+      return null;
+    }
+
+    if (!chunk.getBlockType(newPos)
+        .getId().equals(EMPTY_BLOCK_ID)) {
+      newPos.add(Vector3i.UP);
+    }
+
+    Vector3i frontBottom = newPos.clone().add(Vector3i.DOWN);
+
+    if (chunk.getBlockType(frontBottom)
+        .getId().equals(EMPTY_BLOCK_ID)) {
+
+      Vector3i twoDown = frontBottom.clone().add(Vector3i.DOWN);
+
+      if (!chunk.getBlockType(twoDown)
+          .getId().equals(EMPTY_BLOCK_ID)) {
+
+        newPos = frontBottom.add(Vector3i.UP);
+      } else {
+        return null;
+      }
+    }
+
+    return new MoveTarget(chunk, newPos, rotation);
+  }
+
   @Override
   public Query<ChunkStore> getQuery() {
     return Query.and(
         BlockModule.BlockStateInfo.getComponentType(),
         AncientConstuctComponent.getComponentType());
   }
-
 }

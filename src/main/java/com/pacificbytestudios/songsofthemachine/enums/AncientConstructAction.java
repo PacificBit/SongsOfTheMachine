@@ -12,9 +12,10 @@ public enum AncientConstructAction {
   TURN_RIGHT((byte) 5, "Turn Right", 0.25f, 0.20f, "SFX_SOTM_Track_4"),
   BASIC_BREAK_BLOCK((byte) 6, "Chisel", 0.25f, 0.45f, "SFX_SOTM_Track_5"),
   COMPLEX_BREAK_BLOCK((byte) 7, "Excavate", 0.25f, 0.50f, "SFX_SOTM_Track_6"),
-  DROP_IN_CONTAINER((byte) 8, "Deposit", 0.25f, 0.30f, "SFX_SOTM_Track_7"),
-  TAKE_OUTPUT_BENCH((byte) 9, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6"),
-  EARLY_EXIT((byte) 10, "Start Executing", 0f, 0f, "SFX_SOTM_Track_6");
+  TUNNELLING((byte) 8, "Tunnel", 0.25f, 0.25f, "SFX_SOTM_Track_5", true),
+  DROP_IN_CONTAINER((byte) 9, "Deposit", 0.25f, 0.30f, "SFX_SOTM_Track_7"),
+  TAKE_OUTPUT_BENCH((byte) 10, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6"),
+  EARLY_EXIT((byte) 11, "Start Executing", 0f, 0f, "SFX_SOTM_Track_4");
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();
@@ -25,6 +26,7 @@ public enum AncientConstructAction {
   private final String soundId;
   private final float executionTime; // in secs
   private final float cooldownTime; // in secs
+  private final boolean isComplexInstruction;
 
   static {
     for (AncientConstructAction action : values()) {
@@ -43,6 +45,7 @@ public enum AncientConstructAction {
     ACTION_TO_UI_ID_MAP.put(TURN_RIGHT, "TurnRight");
     ACTION_TO_UI_ID_MAP.put(BASIC_BREAK_BLOCK, "BasicBreakBlock");
     ACTION_TO_UI_ID_MAP.put(COMPLEX_BREAK_BLOCK, "ComplexBreakBlock");
+    ACTION_TO_UI_ID_MAP.put(TUNNELLING, "Tunnelling");
     ACTION_TO_UI_ID_MAP.put(DROP_IN_CONTAINER, "DropInContainer");
     ACTION_TO_UI_ID_MAP.put(TAKE_OUTPUT_BENCH, "TakeOutputBench");
   }
@@ -51,12 +54,28 @@ public enum AncientConstructAction {
     return ACTION_TO_UI_ID_MAP.get(action);
   }
 
-  AncientConstructAction(byte id, String name, float executionTime, float cooldownTime, String soundId) {
+  AncientConstructAction(
+      byte id,
+      String name,
+      float executionTime,
+      float cooldownTime,
+      String soundId) {
+    this(id, name, executionTime, cooldownTime, soundId, false);
+  }
+
+  AncientConstructAction(
+      byte id,
+      String name,
+      float executionTime,
+      float cooldownTime,
+      String soundId,
+      Boolean isComplexInstruction) {
     this.id = id;
     this.executionTime = executionTime;
     this.name = name;
     this.soundId = soundId;
     this.cooldownTime = cooldownTime;
+    this.isComplexInstruction = isComplexInstruction;
   }
 
   public byte getId() {
@@ -77,6 +96,10 @@ public enum AncientConstructAction {
 
   public float getCooldownTime() {
     return this.cooldownTime;
+  }
+
+  public boolean isComplexInstruction() {
+    return isComplexInstruction;
   }
 
   public static AncientConstructAction fromByte(byte id) {

@@ -200,6 +200,8 @@ public class AncientConstructLogicSystem extends EntityTickingSystem<ChunkStore>
       case COMPLEX_BREAK_BLOCK -> breakBlock(context, entityRef, blockPos, action);
       case DROP_IN_CONTAINER -> dropInContainer(context, entityRef, blockPos);
       case TAKE_OUTPUT_BENCH -> takeBenchOutput(context, entityRef, blockPos);
+      case EARLY_EXIT -> {
+      }
       case IDLE -> {
       }
     }

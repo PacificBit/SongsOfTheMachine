@@ -19,7 +19,6 @@ import com.pacificbytestudios.songsofthemachine.enums.AncientConstructStatus;
 public class AncientConstuctComponent extends ItemContainerState {
   private static final short STORAGE_CAPACITY = 18;
   private static final int BIT_ACTION_SIZE = 4;
-  private static final int MAX_ACTIONS = Long.SIZE / BIT_ACTION_SIZE;
   private static final long ACTION_MASK = 0xFL;
 
   public static final BuilderCodec<AncientConstuctComponent> CODEC = BuilderCodec

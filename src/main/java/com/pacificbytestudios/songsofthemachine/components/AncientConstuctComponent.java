@@ -308,7 +308,8 @@ public class AncientConstuctComponent extends ItemContainerState {
         this.actionBuffer = this.bkActionBuffer;
         return;
       }
-//       System.out.println("[AncientConstuctComponent] clearNextAction - Completed all the scheduled actions");
+      // System.out.println("[AncientConstuctComponent] clearNextAction - Completed
+      // all the scheduled actions");
       this.status = AncientConstructStatus.COMPLETED;
     }
   }
@@ -331,7 +332,7 @@ public class AncientConstuctComponent extends ItemContainerState {
     c.cooldown = this.cooldown;
     c.cooldownMultiplier = this.cooldownMultiplier;
     c.storage = EmptyItemContainer.getNewContainer(STORAGE_CAPACITY, SimpleItemContainer::new);
-    c.waypoints = this.waypoints;
+    c.waypoints = new ArrayDeque<>();
     c.instructionSubPhase = this.instructionSubPhase;
     c.targetPos = this.targetPos;
     return c;

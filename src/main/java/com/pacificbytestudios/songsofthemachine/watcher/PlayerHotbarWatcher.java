@@ -18,6 +18,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.enums.AncientConstructAction;
+import com.pacificbytestudios.songsofthemachine.enums.MusicToolQuality;
 import com.pacificbytestudios.songsofthemachine.hui.EmptyHUI;
 import com.pacificbytestudios.songsofthemachine.hui.ToolSelectionHUI;
 import com.pacificbytestudios.songsofthemachine.storage.MusicToolHUIStorage;
@@ -80,13 +81,15 @@ public class PlayerHotbarWatcher implements PlayerPacketWatcher {
 
       if (musicTool.getCapacity() < 0) {
         String targetItemId = targetItem.getItemId();
-        int capacity = 1;
+        int capacity = MusicToolComponent.LOW_CAPACITY;
         if (targetItemId.contains("Avg")) {
-          capacity = 2;
+          capacity = MusicToolComponent.AVG_CAPACITY;
         } else if (targetItemId.contains("Great")) {
-          capacity = 4;
+          capacity = MusicToolComponent.GREAT_CAPACITY;
         }
         musicTool.setCapacity((byte) capacity);
+        // for compatility
+        musicTool.setQuality(MusicToolQuality.AVG.getId());
       }
 
       if (musicTool.getUUID() == null) {

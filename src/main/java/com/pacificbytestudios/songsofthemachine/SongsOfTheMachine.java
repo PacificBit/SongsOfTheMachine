@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.pacificbytestudios.songsofthemachine.components.AncientConstuctComponent;
 import com.pacificbytestudios.songsofthemachine.components.MusicToolComponent;
 import com.pacificbytestudios.songsofthemachine.events.PlayerReadyHandler;
+import com.pacificbytestudios.songsofthemachine.interactions.CallToActionInteraction;
 import com.pacificbytestudios.songsofthemachine.interactions.MusicToolChangeActionInteraction;
 import com.pacificbytestudios.songsofthemachine.interactions.MusicToolUseInteraction;
 import com.pacificbytestudios.songsofthemachine.systems.AncientConstructLogicSystem;
@@ -44,9 +45,16 @@ public final class SongsOfTheMachine extends JavaPlugin {
     System.out.println("[SongsOfTheMachine] Registered MusicToolComponent");
 
     this.getCodecRegistry(Interaction.CODEC)
-        .register("MusicToolUseInteraction", MusicToolUseInteraction.class, MusicToolUseInteraction.CODEC)
-        .register("MusicToolChangeAction", MusicToolChangeActionInteraction.class,
-            MusicToolChangeActionInteraction.CODEC);
+        .register(
+            "MusicToolUseInteraction",
+            MusicToolUseInteraction.class,
+            MusicToolUseInteraction.CODEC)
+        .register("MusicToolChangeAction",
+            MusicToolChangeActionInteraction.class,
+            MusicToolChangeActionInteraction.CODEC)
+        .register("CallToActionInteraction",
+            CallToActionInteraction.class,
+            CallToActionInteraction.CODEC);
     System.out.println("[SongsOfTheMachine] Registered MusicToolUseInteraction & MusicToolChangeActionInteraction");
 
     this.getChunkStoreRegistry().registerSystem(new AncientConstructPlacementSystem());

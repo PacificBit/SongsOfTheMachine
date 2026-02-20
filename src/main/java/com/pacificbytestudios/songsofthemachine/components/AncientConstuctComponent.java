@@ -66,12 +66,11 @@ public class AncientConstuctComponent extends ItemContainerState {
       this.listeningToPlayerInstrumentId = listeningTo;
     }
 
-    if (this.actionCount > this.actionCapacity)
-
-    {
+    if (this.actionCount > this.actionCapacity) {
       this.status = AncientConstructStatus.ERROR;
       return false;
     }
+
     int id = action.getId()
         & 0xFF;
     this.actionBuffer |= (id << (this.actionCount * BIT_ACTION_SIZE));
@@ -79,7 +78,8 @@ public class AncientConstuctComponent extends ItemContainerState {
     this.actionCount += 1;
     this.bkActionCount = this.actionCount;
 
-    if (this.actionCount == this.actionCapacity) {
+    if (this.actionCount == this.actionCapacity ||
+        action.equals(AncientConstructAction.EARLY_EXIT)) {
       this.status = AncientConstructStatus.READY_TO_EXECUTE;
     }
     return true;

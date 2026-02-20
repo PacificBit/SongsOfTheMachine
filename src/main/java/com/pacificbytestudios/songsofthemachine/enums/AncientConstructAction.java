@@ -13,25 +13,12 @@ public enum AncientConstructAction {
   BASIC_BREAK_BLOCK((byte) 6, "Chisel", 0.25f, 0.45f, "SFX_SOTM_Track_5"),
   COMPLEX_BREAK_BLOCK((byte) 7, "Excavate", 0.25f, 0.50f, "SFX_SOTM_Track_6"),
   DROP_IN_CONTAINER((byte) 8, "Deposit", 0.25f, 0.30f, "SFX_SOTM_Track_7"),
-  TAKE_OUTPUT_BENCH((byte) 9, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6");
+  TAKE_OUTPUT_BENCH((byte) 9, "Collect", 0.25f, 0.30f, "SFX_SOTM_Track_6"),
+  EARLY_EXIT((byte) 10, "Start Executing", 0f, 0f, "SFX_SOTM_Track_6");
 
   private static final Map<Byte, AncientConstructAction> BY_ID = new HashMap<>();
   private static final Map<AncientConstructAction, int[]> ACTION_TO_EXCAVATION_SIZE_MAP = new HashMap<>();
   private static final Map<AncientConstructAction, String> ACTION_TO_UI_ID_MAP = new HashMap<>();
-
-  static {
-    for (AncientConstructAction action : values()) {
-      BY_ID.put(action.id, action);
-    }
-
-    ACTION_TO_EXCAVATION_SIZE_MAP.put(
-        AncientConstructAction.BASIC_BREAK_BLOCK,
-        new int[] { 1, 2 });
-
-    ACTION_TO_EXCAVATION_SIZE_MAP.put(
-        AncientConstructAction.COMPLEX_BREAK_BLOCK,
-        new int[] { 3, 3 });
-  }
 
   private final byte id;
   private final String name;
@@ -41,6 +28,7 @@ public enum AncientConstructAction {
 
   static {
     for (AncientConstructAction action : values()) {
+
       BY_ID.put(action.id, action);
     }
 

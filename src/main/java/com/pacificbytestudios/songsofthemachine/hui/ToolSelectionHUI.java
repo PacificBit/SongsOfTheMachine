@@ -23,6 +23,9 @@ public class ToolSelectionHUI extends CustomUIHud {
     UICommandBuilder commandBuilder = new UICommandBuilder();
 
     for (AncientConstructAction ancientConstructAction : AncientConstructAction.values()) {
+      if (ancientConstructAction.equals(AncientConstructAction.EARLY_EXIT)) {
+        continue;
+      }
       String id = AncientConstructAction.getUiIdFor(ancientConstructAction);
       String style = "Empty";
 

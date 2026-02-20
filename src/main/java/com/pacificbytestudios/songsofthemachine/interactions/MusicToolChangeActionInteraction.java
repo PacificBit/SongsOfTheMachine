@@ -45,12 +45,12 @@ public class MusicToolChangeActionInteraction extends SimpleInteraction {
   private static Map<AncientConstructAction, Integer> buildIndex(AncientConstructAction[] cycle) {
     EnumMap<AncientConstructAction, Integer> map = new EnumMap<>(AncientConstructAction.class);
 
-    IntStream.range(0, cycle.length)
+    IntStream.range(0, cycle.length - 1)
         .forEach(i -> {
           map.put(cycle[i], i);
         });
 
-    actionCount = cycle.length;
+    actionCount = cycle.length - 1;
     return map;
   }
 

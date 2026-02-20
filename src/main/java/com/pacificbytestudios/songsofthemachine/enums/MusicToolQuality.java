@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum MusicToolQuality {
-  POOR((byte) 1, (byte) 16),
-  MEDIUM((byte) 2, (byte) 32),
+  LOW((byte) 1, (byte) 16),
+  AVG((byte) 2, (byte) 32),
   GREAT((byte) 3, (byte) 64);
 
   private final byte id;

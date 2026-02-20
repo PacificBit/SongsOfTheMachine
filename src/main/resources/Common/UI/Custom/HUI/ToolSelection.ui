@@ -216,7 +216,7 @@ Group #ActionBuffer {
 
 
 Group #Legend {
-  Anchor: (Left: 50, Top: 930, Width: 120, Height: 40);
+  Anchor: (Left: 50, Top: 900, Width: 120, Height: 40);
   LayoutMode: Top;
 
   Group #ActivateTool {
@@ -239,8 +239,68 @@ Group #Legend {
     }
 
     Label {
-      Text: "Play sound";
+      Text: "Add Command";
+      Padding: (Full: 3, Left: 8);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+  }
+
+  Group #CTAction {
+    LayoutMode: Left;
+    Padding: (Top: 12);
+
+    Group #ModActionIcon {
+      Anchor: (Width: 60, Height: 30);
+      Background: (TexturePath: "../Common/InputBinding.png", Border: 3);
+      LayoutMode: CenterMiddle;
+
+      Label {
+        Text: "CTRL";
+        Style: (
+          FontSize: 15,
+          HorizontalAlignment: End,
+          VerticalAlignment: End,
+          RenderBold: true,
+        );
+      }
+    }
+
+    Label {
+      Text: "+";
       Padding: (Full: 3);
+      Style: (
+        FontSize: 15,
+        HorizontalAlignment: End,
+        VerticalAlignment: End,
+        RenderBold: true,
+      );
+    }
+
+
+    Group #ActionIcon {
+      Anchor: (Width: 30, Height: 30);
+      Background: (TexturePath: "../Common/InputBinding.png", Border: 3);
+      LayoutMode: CenterMiddle;
+
+      Label {
+        Text: "F";
+        Style: (
+          FontSize: 15,
+          HorizontalAlignment: End,
+          VerticalAlignment: End,
+          RenderBold: true,
+        );
+      }
+    }
+
+    Label {
+      Text: "Start executing";
+      Padding: (Full: 3, Left: 8);
       Style: (
         FontSize: 15,
         HorizontalAlignment: End,
